@@ -9,6 +9,11 @@ $can_upload = in_array($permission, ['owner', 'upload']);
 
 $can_manage = ($permission === 'owner');
 
+// ✅ NEW: Get user access level for premium checks
+$current_user_id = get_current_user_id();
+$access_level = Hamnaghsheh_Users::get_user_access_level($current_user_id);
+$can_archive = Hamnaghsheh_Utils::can_perform_action('archive', $access_level);
+
 function gregorian_to_jalali($gy,$gm,$gd){
   $g_d_m = [0,31,59,90,120,151,181,212,243,273,304,334];
   $gy2 = ($gm > 2)?($gy + 1):$gy;
@@ -31,7 +36,6 @@ function jalaliDate($datetime) {
     list($gy, $gm, $gd) = explode('-', date('Y-m-d', $timestamp));
     list($jy, $jm, $jd) = gregorian_to_jalali($gy, $gm, $gd);
 
-    // تبدیل به اعداد فارسی
     $farsi_digits = ['۰','۱','۲','۳','۴','۵','۶','۷','۸','۹'];
     $english_digits = ['0','1','2','3','4','5','6','7','8','9'];
 
@@ -61,6 +65,7 @@ function jalaliDate($datetime) {
         </p>
       </div>
       <hr class="border-gray-300 mb-8">
+      
       <?php if (!empty($_SESSION['alert'])): ?>
         <?php
         $alert = $_SESSION['alert'];
@@ -100,36 +105,42 @@ function jalaliDate($datetime) {
       <?php endif; ?>
 
       <div class="flex flex-col lg:flex-row justify-between mb-8 space-y-1 lg:space-y-0">
-        <?php
-        if ($can_manage) {
-          echo '<form action="' . esc_url(admin_url('admin-post.php')) . '" method="post" onsubmit="return confirmArchive();">
-                  <input type="hidden" name="action" value="hamnaghsheh_archive_project">
-                  <input type="hidden" name="project_id" value="'.esc_attr($project->id).'">
-
-                  <button type="submit" class="bg-[#09375B] w-100 lg:w-100 text-sm outline-none hover:bg-[#072c48] text-white p-2 rounded transition">
-                    📦 آرشیو پروژه
-                  </button>
-                </form>';
-        }
-        ?>
+        
+        <!-- added by Soroush - 6 Dec 2025 - Archive Button with Premium Check -->
+        <?php if ($can_manage): ?>
+          <?php if ($can_archive): ?>
+            <form action="<?php echo esc_url(admin_url('admin-post.php')); ?>" method="post" onsubmit="return confirmArchive();">
+              <input type="hidden" name="action" value="hamnaghsheh_archive_project">
+              <input type="hidden" name="project_id" value="<?php echo esc_attr($project->id); ?>">
+              <button type="submit" class="bg-[#09375B] w-100 lg:w-100 text-sm outline-none hover:bg-[#072c48] text-white p-2 rounded transition">
+                📦 آرشیو پروژه
+              </button>
+            </form>
+          <?php else: ?>
+            <button class="locked-feature bg-gray-300 w-100 lg:w-100 text-sm text-gray-500 p-2 rounded cursor-not-allowed opacity-50"
+                    data-current-plan="<?php echo $access_level; ?>"
+                    data-feature-name="آرشیو پروژه"
+                    title="فقط کاربران اشتراک شخصی و سازمانی">
+            🔒 آرشیو پروژه (نیاز به اشتراک)
+            </button>
+          <?php endif; ?>
+        <?php endif; ?>
 
         <div class="flex-col flex lg:flex-row space-y-1 gap-0 lg:gap-3 lg:space-y-0">
           <?php if ($can_upload): ?>
             <button class="bg-[#FFCF00] text-sm outline-none hover:bg-[#e6bd00] text-[#09375B] p-2 rounded transition"
               onclick="downloadProjectFiles(<?= $project->id ?>)">⬇️ دانلود همه فایل‌ها</button>
           <?php endif; ?>
-          <?php
-          if ($can_manage) {
-            echo "
-              <button id='open-share-popup'
-                class='bg-blue-600 hover:bg-blue-700 text-white text-sm  px-4 py-2 rounded transition-all duration-200'>
-                🔗 ایجاد لینک اشتراک
-              </button>
-            ";
-          }
-          ?>
+          
+          <?php if ($can_manage): ?>
+            <button id='open-share-popup'
+              class='bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded transition-all duration-200'>
+              🔗 ایجاد لینک اشتراک
+            </button>
+          <?php endif; ?>
         </div>
 
+        <!-- Share Popup Modal -->
         <div id="share-popup" style="z-index:1000;" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
           <div class="bg-white rounded-xl text-sm p-6 w-[600px]">
             <button type="button" id="close-share-popup" class="text-gray-600 text-2xl w-10 h-10"
@@ -178,13 +189,9 @@ function jalaliDate($datetime) {
                 echo "<p class='text-gray-500 text-sm text-center bg-gray-50 border border-dashed border-gray-300 rounded-xl p-6'>هیچ لینکی ساخته نشده.</p>";
               }
               ?>
-
             </div>
           </div>
         </div>
-
-
-
 
       </div>
 
@@ -226,11 +233,11 @@ function jalaliDate($datetime) {
                         ?>
                          <a target="_blank" href="<?php echo $final_url; ?>" class="bg-slate-800 hover:bg-slate-900 text-white px-3 py-1 rounded-lg text-xs font-semibold transition flex items-center justify-center"  onclick="logSee(<?php echo intval($f['id']); ?>, <?php echo intval($project->id); ?>)">مشاهده</a>
                     <?php
-                        
                     } else {
                         $final_url = null;
                     }
                     ?>
+                    
                     <?php if ($can_manage): ?>
                       <button onclick="openFileLogsModal(<?php echo $f['id']; ?>)"
                         class="bg-[#09375B] hover:bg-[#072c48] text-white px-3 py-1 rounded-lg text-xs font-semibold transition flex items-center justify-center">سوابق</button>
@@ -242,9 +249,10 @@ function jalaliDate($datetime) {
                         جایگزینی
                       </button>
                     <?php endif; ?>
+                    
                     <?php if ($can_manage): ?>
                       <a href="<?php echo esc_url(admin_url('admin-post.php?action=hamnaghsheh_delete_file&file_id=' . $f['id'] . '&project_id=' . $project->id)); ?>"
-                        class=" flex items-center justify-center bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-lg text-xs font-semibold transition"
+                        class="flex items-center justify-center bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-lg text-xs font-semibold transition"
                         onclick="return confirm('آیا از حذف این فایل مطمئن هستید؟');">
                         حذف
                       </a>
@@ -260,25 +268,20 @@ function jalaliDate($datetime) {
           </tbody>
         </table>
 
-
-
-
+        <!-- File Logs Modal -->
         <div id="fileLogsModal"
           class="fixed inset-0 hidden items-center justify-center z-50 inset-0 bg-black bg-opacity-50">
           <div class="bg-white rounded-2xl shadow-xl w-11/12 max-w-lg p-6 relative">
             <button onclick="closeFileLogsModal()"
               class="absolute top-2 left-3 text-gray-400 hover:text-gray-600 text-xl">×</button>
             <h2 class="text-lg font-bold mb-4 text-[#09375B]">سوابق فایل</h2>
-            <div id="fileLogsContent" class="space-y-5 text-sm text-gray-700" style="
-    max-height: 300px;
-    overflow-y: scroll;
-">
+            <div id="fileLogsContent" class="space-y-5 text-sm text-gray-700" style="max-height: 300px; overflow-y: scroll;">
               <p class="text-center text-gray-400">در حال بارگذاری...</p>
             </div>
           </div>
         </div>
 
-        <!-- Modal Background -->
+        <!-- Replace File Modal -->
         <div id="replaceModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
           <div class="bg-white rounded-2xl p-6 w-full max-w-md relative shadow-xl">
             <h2 class="text-lg font-bold mb-4 text-gray-800">جایگزینی فایل</h2>
@@ -303,9 +306,6 @@ function jalaliDate($datetime) {
             </form>
           </div>
         </div>
-
-
-
 
       </div>
 

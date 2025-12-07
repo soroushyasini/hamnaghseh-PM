@@ -6,6 +6,11 @@ $current_user = wp_get_current_user();
 $projects = Hamnaghsheh_Projects::get_user_projects($current_user->ID);
 $role = false;
 
+// ✅ NEW: Get user access level
+$access_level = Hamnaghsheh_Users::get_user_access_level($current_user->ID);
+$can_archive = Hamnaghsheh_Utils::can_perform_action('archive', $access_level);
+$is_admin = current_user_can('manage_options');
+
 ?>
 
 <div class="wrap hamnaghsheh-dashboard rounded-2xl p-5 lg:p-10">
@@ -20,7 +25,7 @@ $role = false;
         </div>
         <div class="flex items-center justify-center gap-2">
             
-                      <a href="<?php echo esc_url(site_url('/shop')); ?>"
+          <a href="<?php echo esc_url(site_url('/shop')); ?>"
             class="border bg-transparent text-slate-900 px-4 py-2 rounded text-sm">
             خدمات نقشه برداری
           </a>
@@ -35,6 +40,29 @@ $role = false;
       </div>
       <hr class="border-gray-300 mb-5">
 
+      <!-- ✅ NEW: Free User Upgrade Notice -->
+      <?php if ($access_level === 'free'): ?>
+        <div class="mb-5 p-4 bg-blue-50 border-r-4 border-blue-500 rounded-lg">
+          <div class="flex items-start">
+            <div class="flex-shrink-0">
+              <svg class="h-5 w-5 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+              </svg>
+            </div>
+            <div class="mr-3 flex-1">
+              <h3 class="text-sm font-semibold text-blue-800">شما در حال استفاده از پکیج رایگان هستید</h3>
+              <p class="text-xs text-blue-700 mt-1">
+                با ارتقا به پکیج شخصی، امکان آپلود فایل، آرشیو پروژه و ۱۰۰ مگابایت فضای ذخیره‌سازی دریافت کنید.
+              </p>
+              <a href="<?php echo esc_url(site_url('/plans')); ?>" 
+                 class="inline-block mt-2 text-xs font-semibold text-blue-600 hover:text-blue-800 hover:underline">
+                مشاهده پکیج‌ها و ارتقا ←
+              </a>
+            </div>
+          </div>
+        </div>
+      <?php endif; ?>
+
       <div class="rounded border border-slate-200">
         <div class="flex items-center justify-between rounded-t bg-[#09375B]/10 p-2">
           <h2 class="text-md xl:text-xl font-bold text-[#09375B]">پروژه‌ها</h2>
@@ -44,12 +72,9 @@ $role = false;
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <?php if ($projects): ?>
               <?php foreach ($projects as $p): ?>
-                <div
-                  class="rounded grid grid-cols-1 lg:grid-cols-8 p-3 border border-slate-300 lg:min-h-24 bg-white hover:shadow-lg transition-all relative ">
+                <div class="rounded grid grid-cols-1 lg:grid-cols-8 p-3 border border-slate-300 lg:min-h-24 bg-white hover:shadow-lg transition-all relative">
 
-
-                  <div
-                    class="col-span-1 h-16 lg:h-auto border border-slate-200 flex items-center justify-center bg-slate-100 rounded">
+                  <div class="col-span-1 h-16 lg:h-auto border border-slate-200 flex items-center justify-center bg-slate-100 rounded">
                     <img class="w-12 h-12" src="<?= HAMNAGHSHEH_URL . 'assets/img/' . $p->type . '.png' ?>" />
                   </div>
 
@@ -68,20 +93,18 @@ $role = false;
 
                   <div class="relative lg:absolute lg:left-5 lg:top-5 p-2 lg:p-0">
                     <div class="flex gap-2 flex-row-reverse items-center justify-start">
-                      <?php
-                      if ($p->is_owner) {
-                        echo '<button style="color:white;" 
-                        onclick="openEditModal('
-                          . '\'' . esc_js($p->id) . '\', '
-                          . '\'' . esc_js($p->name) . '\', '
-                          . '\'' . esc_js($p->description) . '\', '
-                          . '\'' . esc_js($p->type) . '\''
-                          . ')" 
+                      <?php if ($p->is_owner): ?>
+                        <button style="color:white;" 
+                          onclick="openEditModal(
+                            '<?php echo esc_js($p->id); ?>', 
+                            '<?php echo esc_js($p->name); ?>', 
+                            '<?php echo esc_js($p->description); ?>', 
+                            '<?php echo esc_js($p->type); ?>'
+                          )" 
                           class="text-sm border border-blue-600 text-blue-700 rounded px-3 outline-none hover:bg-blue-600 hover:text-white transition-all">
                           ویرایش
-                        </button>';
-                      }
-                      ?>
+                        </button>
+                      <?php endif; ?>
 
                       <div>
                         <div class="rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700">
@@ -101,38 +124,66 @@ $role = false;
           </div>
         </div>
 
+        <!-- ✅ ENHANCED: Archived Projects Section -->
         <?php if ($archived_project): ?>
           <div class="mt-6">
             <div class="flex items-center justify-between bg-[#09375B]/10 p-2" role="alert">
               <h2 class="text-md xl:text-xl font-bold text-[#09375B]">پروژه‌های آرشیو شده</h2>
             </div>
-            <div class="space-y-1">
+            <div class="space-y-1 p-2">
               <?php foreach ($archived_project as $p): ?>
-                <div class="p-3 opacity-60 cursor-not-allowed flex items-center justify-between border">
-                  <div>
-                    <span class="text-[#09375B]"><?php echo esc_html($p->name); ?></span>
+                <div class="p-3 flex items-center justify-between border border-slate-200 rounded bg-gray-50">
+                  <div class="flex items-center gap-3">
+                    <span class="text-gray-400">📦</span>
+                    <div>
+                      <span class="text-[#09375B] font-semibold"><?php echo esc_html($p->name); ?></span>
+                      <div class="text-xs text-gray-500 mt-1">آرشیو شده در: <?php echo esc_html(date_i18n('Y/m/d', strtotime($p->updated_at))); ?></div>
+                    </div>
                   </div>
-                  <div class="flex items-center justify-between gap-2">
-                      <div class="text-xs text-gray-500 italic">آرشیو شده</div>
+                  
+                  <div class="flex items-center gap-2">
+                    <?php if ($is_admin): ?>
+                      <!-- ✅ Admin can restore -->
                       <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
                         <input type="hidden" name="action" value="hamnaghsheh_unarchive_project">
-                        <input type="hidden" name="project_id" value="<?php echo esc_html($p->id); ?>">
-                        <button type="submit" class="text-xs rounded" style="display:none;">خارج کردن</button>
+                        <input type="hidden" name="project_id" value="<?php echo esc_attr($p->id); ?>">
+                        <button type="submit" 
+                                class="text-xs bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 transition-all"
+                                onclick="return confirm('آیا از بازیابی این پروژه مطمئن هستید؟');">
+                          ♻️ بازیابی
+                        </button>
                       </form>
+                    <?php else: ?>
+                      <!-- ✅ Regular users see contact admin message -->
+                      <div class="text-xs text-gray-500 italic">
+                        <span class="inline-block mr-2">⚠️ فقط مدیر می‌تواند بازیابی کند</span>
+                        <a href="<?php echo home_url('/contact'); ?>" 
+                           class="text-blue-600 hover:underline">
+                          تماس با مدیر
+                        </a>
+                      </div>
+                    <?php endif; ?>
                   </div>
                 </div>
               <?php endforeach; ?>
             </div>
+            
+            <!-- ✅ NEW: Info box for regular users -->
+            <?php if (!$is_admin): ?>
+              <div class="p-3 bg-amber-50 border-r-4 border-amber-500 rounded-lg mt-2 mx-2">
+                <p class="text-xs text-amber-800">
+                  💡 <strong>نکته:</strong> برای بازیابی پروژه‌های آرشیو شده، لطفاً با مدیر سایت تماس بگیرید.
+                </p>
+              </div>
+            <?php endif; ?>
           </div>
         <?php endif; ?>
 
-
-        <div>
-        </div>
       </div>
     </main>
   </div>
-  <!-- Modal -->
+  
+  <!-- Edit Project Modal -->
   <div id="editModal" class="fixed inset-0 hidden bg-black/50 flex items-center justify-center z-50">
     <div class="bg-white rounded-lg shadow-xl w-96 p-6 relative">
       <button onclick="closeEditModal()" class="absolute top-5 left-5 text-gray-500 hover:text-gray-700">✕</button>

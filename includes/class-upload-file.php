@@ -50,7 +50,7 @@ class Hamnaghsheh_File_Upload
         if ($is_owner) {
             $has_permission = true;
         } else {
-            // بررسی اگر کاربر از طریق لینک اساین شده باشد
+            // بررسی اگر کاربر از طریق لینک اسایگن شده باشد
             $assign = $wpdb->get_row($wpdb->prepare("
                 SELECT permission FROM $table_assign
                 WHERE project_id = %d AND user_id = %d
@@ -67,59 +67,48 @@ class Hamnaghsheh_File_Upload
             exit;
         }
 
-        // محدودیت حجم بر اساس اونر پروژه
-        $user_limit = $wpdb->get_var($wpdb->prepare("SELECT storage_limit FROM $table_users WHERE user_id = %d", $project->user_id));
-        if (!$user_limit)
-            $user_limit = 52428800; // ۵۰ مگابایت پیشفرض
+        // ✅ NEW: Check if user can upload based on access level -  added by soroush - 4 Dec 2025
+        $can_upload = Hamnaghsheh_File_Validator::can_user_upload($user_id);
+        if (!$can_upload['can_upload']) {
+            $_SESSION['alert'] = ['type' => 'error', 'message' => $can_upload['message']];
+            wp_redirect(home_url('/show-project/?id=' . $project_id));
+            exit;
+        }
 
-        $used_space = $wpdb->get_var($wpdb->prepare("SELECT SUM(file_size) FROM $table_files WHERE project_id = %d", $project_id));
-        if (!$used_space)
-            $used_space = 0;
+        // ✅ NEW: Validate file type based on user's access level   -  added by soroush - 4 Dec 2025
+        $file_validation = Hamnaghsheh_File_Validator::validate_file_type($file['name'], $user_id);
+        if (!$file_validation['valid']) {
+            $_SESSION['alert'] = ['type' => 'error', 'message' => $file_validation['message']];
+            wp_redirect(home_url('/show-project/?id=' . $project_id));
+            exit;
+        }
 
+        // ✅ NEW: Check storage quota using validator  -  added by soroush - 4 Dec 2025
         $new_file_size = intval($file['size']);
-        if (($used_space + $new_file_size) > $user_limit) {
-            $_SESSION['alert'] = ['type' => 'error', 'message' => 'حجم مجاز ذخیره‌سازی کافی نیست.'];
+        $quota_check = Hamnaghsheh_File_Validator::check_storage_quota($project_id, $new_file_size, $project->user_id);
+        if (!$quota_check['valid']) {
+            $_SESSION['alert'] = ['type' => 'error', 'message' => $quota_check['message']];
             wp_redirect(home_url('/show-project/?id=' . $project_id));
             exit;
         }
 
-        // مسیر ذخیره
-        $upload_dir = wp_upload_dir();
-        $project_dir = $upload_dir['basedir'] . '/hamnaghsheh/' . $project_id;
-        if (!file_exists($project_dir))
-            wp_mkdir_p($project_dir);
-
-        $file_name = sanitize_file_name($file['name']);
-        $file_path = $project_dir . '/' . $file_name;
-
-        $allowed_extensions = ['dwg', 'dxf', 'txt'];
-        $file_ext = strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
-
-        if (!in_array($file_ext, $allowed_extensions)) {
-            $_SESSION['alert'] = [
-                'type' => 'error',
-                'message' => 'فقط فایل‌های با پسوند DWG ،DXF و TXT مجاز به آپلود هستند.'
-            ];
-            wp_redirect(home_url('/show-project/?id=' . $project_id));
-            exit;
-        }
-        
+        // ✅ Upload to MinIO
         $minio = Hamnaghsheh_Minio::instance();
         $response = $minio->upload($file['tmp_name'], $file['name']);
         
         $relative_path = '';
         $key = '';
         if ($response['success']) {
-            
             $relative_path = $response['url'];
-            
             $key = $response['key'];
-            
         } else {
-             $_SESSION['alert'] = ['type' => 'error', 'message' => $response['error']];
-             wp_redirect(home_url('/show-project/?id=' . $project_id));
+            $_SESSION['alert'] = ['type' => 'error', 'message' => $response['error']];
+            wp_redirect(home_url('/show-project/?id=' . $project_id));
+            exit;
         }
 
+        // ✅ Save file record
+        $file_name = sanitize_file_name($file['name']);
         $wpdb->insert($table_files, [
             'project_id' => $project_id,
             'user_id' => $user_id,
@@ -133,6 +122,7 @@ class Hamnaghsheh_File_Upload
 
         $file_id = $wpdb->insert_id;
 
+        // ✅ Log the upload action
         $wpdb->insert(
             $table_file_logs,
             [
@@ -144,7 +134,7 @@ class Hamnaghsheh_File_Upload
             ['%d', '%d', '%d', '%s']
         );
 
-        $_SESSION['alert'] = ['type' => 'success', 'message' => 'فایل با موفقیت آپلود شد.'];
+        $_SESSION['alert'] = ['type' => 'success', 'message' => '✅ فایل با موفقیت آپلود شد.'];
         wp_redirect(home_url('/show-project/?id=' . $project_id));
         exit;
     }
@@ -179,23 +169,23 @@ class Hamnaghsheh_File_Upload
             exit;
         }
         
-            // added by soroush 11/12/2025///////////
-           // ✅NEW: Check if user is premium before allowing delete
+        // ✅ Check if user is premium or enterprise before allowing delete
         if (!Hamnaghsheh_Users::is_premium_user($user_id)) {
-            $_SESSION['alert'] = [
-                'type' => 'error', 
-                'message' => ' حذف فایل فقط برای کاربران پرمیوم امکان‌پذیر است. برای ارتقا به پرمیوم، تیکت بزنید.'
-            ];
+            $access_level = Hamnaghsheh_Users::get_user_access_level($user_id);
+            $message = Hamnaghsheh_File_Validator::get_upgrade_message('delete', $access_level);
+            $_SESSION['alert'] = ['type' => 'error', 'message' => $message];
             wp_redirect(home_url('/show-project/?id=' . $project_id));
             exit;
         }
-        /////////////////////////////////////
-        // حذف از پوشه
-            
+
+        // ✅ Delete from MinIO
         $minio = Hamnaghsheh_Minio::instance();
         $result = $minio->delete($file->key_file);
 
+        // ✅ Delete from database
         $wpdb->delete($table_files, ['id' => $file_id], ['%d']);
+        
+        // ✅ Log the delete action
         $wpdb->insert(
             $table_file_logs,
             [
@@ -207,8 +197,7 @@ class Hamnaghsheh_File_Upload
             ['%d', '%d', '%d', '%s']
         );
 
-
-        $_SESSION['alert'] = ['type' => 'success', 'message' => 'فایل با موفقیت حذف شد.'];
+        $_SESSION['alert'] = ['type' => 'success', 'message' => '✅ فایل با موفقیت حذف شد.'];
         wp_redirect(home_url('/show-project/?id=' . $project_id));
         exit;
     }
@@ -233,11 +222,9 @@ class Hamnaghsheh_File_Upload
         $table_file_logs = $wpdb->prefix . 'hamnaghsheh_file_logs';
         $table_users = $wpdb->prefix . 'hamnaghsheh_users';
 
-
         $project = $wpdb->get_row($wpdb->prepare("SELECT * FROM $table_projects WHERE id = %d", $project_id));
         if (!$project)
             wp_die('پروژه یافت نشد.');
-
 
         $is_owner = ($project->user_id == $user_id);
         $has_permission = false;
@@ -261,18 +248,23 @@ class Hamnaghsheh_File_Upload
             exit;
         }
         
-        
-        // ✅NEW: Check if user is premium before allowing replace
+        // ✅ Check if user is premium or enterprise before allowing replace
         // Only check for project owner, not for assigned users
         if ($is_owner && !Hamnaghsheh_Users::is_premium_user($user_id)) {
-            $_SESSION['alert'] = [
-                'type' => 'error', 
-                'message' => '⚠️ جایگزینی فایل فقط برای کاربران پرمیوم امکان‌پذیر است. برای ارتقا به پرمیوم، با مدیر تماس بگیرید.'
-            ];
+            $access_level = Hamnaghsheh_Users::get_user_access_level($user_id);
+            $message = Hamnaghsheh_File_Validator::get_upgrade_message('replace', $access_level);
+            $_SESSION['alert'] = ['type' => 'error', 'message' => $message];
             wp_redirect(home_url('/show-project/?id=' . $project_id));
             exit;
         }
-        
+
+        // ✅ NEW: Validate file type based on user's access level
+        $file_validation = Hamnaghsheh_File_Validator::validate_file_type($file['name'], $user_id);
+        if (!$file_validation['valid']) {
+            $_SESSION['alert'] = ['type' => 'error', 'message' => $file_validation['message']];
+            wp_redirect(home_url('/show-project/?id=' . $project_id));
+            exit;
+        }
         
         $old_file = $wpdb->get_row($wpdb->prepare("SELECT * FROM $table_files WHERE id = %d", $file_id));
         if (!$old_file) {
@@ -281,35 +273,26 @@ class Hamnaghsheh_File_Upload
             exit;
         }
         
-        $file_name = sanitize_file_name($file['name']);
-        
-        $allowed_extensions = ['dwg', 'dxf', 'txt'];
-        $file_ext = strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
-        
-        if (!in_array($file_ext, $allowed_extensions)) {
-            $_SESSION['alert'] = ['type' => 'error', 'message' => 'فرمت فایل مجاز نیست.'];
-            wp_redirect(home_url('/show-project/?id=' . $project_id));
-            exit;
-        }
-        
+        // ✅ Delete old file from MinIO
         $minio = Hamnaghsheh_Minio::instance();
         $result = $minio->delete($old_file->key_file);
         
+        // ✅ Upload new file to MinIO
         $response = $minio->upload($file['tmp_name'], $file['name']);
         
         $relative_path = '';
         $key = '';
         if ($response['success']) {
-            
             $relative_path = $response['url'];
-            
             $key = $response['key'];
-            
         } else {
-             $_SESSION['alert'] = ['type' => 'error', 'message' => $response['error']];
-             wp_redirect(home_url('/show-project/?id=' . $project_id));
+            $_SESSION['alert'] = ['type' => 'error', 'message' => $response['error']];
+            wp_redirect(home_url('/show-project/?id=' . $project_id));
+            exit;
         }
         
+        // ✅ Update database record
+        $file_name = sanitize_file_name($file['name']);
         $wpdb->update(
             $table_files,
             [
@@ -325,7 +308,7 @@ class Hamnaghsheh_File_Upload
             ['%d']
         );
 
-
+        // ✅ Log the replace action
         $wpdb->insert(
             $table_file_logs,
             [
@@ -337,9 +320,8 @@ class Hamnaghsheh_File_Upload
             ['%d', '%d', '%d', '%s']
         );
 
-        $_SESSION['alert'] = ['type' => 'success', 'message' => 'فایل با موفقیت جایگزین شد.'];
+        $_SESSION['alert'] = ['type' => 'success', 'message' => '✅ فایل با موفقیت جایگزین شد.'];
         wp_redirect(home_url('/show-project/?id=' . $project_id));
         exit;
     }
-
 }

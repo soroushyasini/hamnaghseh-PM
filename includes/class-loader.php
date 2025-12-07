@@ -28,6 +28,7 @@ class Hamnaghsheh_Loader
     require_once HAMNAGHSHEH_DIR . 'includes/class-user-setting.php';
     require_once HAMNAGHSHEH_DIR . 'includes/class-pages.php';
     require_once HAMNAGHSHEH_DIR . 'includes/class-minio.php';
+    require_once HAMNAGHSHEH_DIR . 'includes/class-file-validator.php';
 
     new Hamnaghsheh_Users();
     new Hamnaghsheh_File_Upload();

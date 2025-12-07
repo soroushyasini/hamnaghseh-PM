@@ -19,16 +19,58 @@ class Hamnaghsheh_Users
         $name = $user_info->display_name;
         $table_name = $wpdb->prefix . 'hamnaghsheh_users';
         
+        // ✅ Insert new user with active = 0 (inactive by default)
+        // disabled the activation process by make any new person actived by defult.
+        // updated the insert quary and the email notif. 6 Dec 2025
         $wpdb->insert(
             $table_name,
             [
                 'user_id' => $user_id,
                 'username' => $username,
                 'email' => $email,
-                'display_name' => $name
+                'display_name' => $name,
+                'active' => 1, // ✅ NEW: Inactive by default
+                'access_level' => 'free', // ✅ NEW: Default to free
+                'storage_limit' => 0 // ✅ NEW: Free users have no storage
             ],
-            ['%d', '%s', '%s', '%s']
+            ['%d', '%s', '%s', '%s', '%d', '%s', '%d']
         );
+
+        // ✅ Send email notification to admin
+        $this->send_admin_notification($user_id, $username, $email);
+    }
+
+    /**
+     * Send email to admin when new user registers
+     * Added by soroush - 12/02/2025
+     * changed the text for match alway-active-new-user logic :
+     */
+    private function send_admin_notification($user_id, $username, $email)
+    {
+        $admin_email = get_option('admin_email');
+        $site_name = get_bloginfo('name');
+        $edit_user_url = admin_url('user-edit.php?user_id=' . $user_id);
+
+        $subject = sprintf('[%s] کاربر جدید در انتظار تایید', $site_name);
+        
+        $message = sprintf(
+            "سلام،\n\n" .
+            "یک کاربر جدید در سایت %s ثبت‌نام کرده است و در انتظار تایید شماست.\n\n" .
+            "اطلاعات کاربر:\n" .
+            "- نام کاربری: %s\n" .
+            "- ایمیل: %s\n" .
+            "- تاریخ ثبت‌نام: %s\n\n" .
+            "برای فعال‌سازی کاربر، به لینک زیر بروید:\n%s\n\n" .
+            "توجه: تا زمانی که کاربر را فعال نکنید، او نمی‌تواند به سیستم دسترسی داشته باشد.",
+            $site_name,
+            $username,
+            $email,
+            current_time('Y-m-d H:i:s'),
+            $edit_user_url
+        );
+
+        // Send email
+        wp_mail($admin_email, $subject, $message);
     }
 
     public static function check_active_user($user_id)
@@ -47,10 +89,10 @@ class Hamnaghsheh_Users
         if (!is_user_logged_in()) {
             exit;
         }
-        
-        $user_id = get_current_user_id();
+
+    $user_id = get_current_user_id();
         if (!self::check_active_user($user_id)) {
-            return '<p class="hamnaghsheh-notice text-red-800 bg-red-100 w-full p-4 rounded-lg text-md text-center">دسترسی شما به سیستم هنوز فعال نشده است لطفاً با مدیر تماس بگیرید</p>';
+            return '<p class="hamnaghsheh-notice text-red-800 bg-red-100 w-full p-4 rounded-lg text-md text-center">دسترسی شما به سیستم هنوز فعال نشده است لطفاً با پشتیبانی تماس بگیرید</p>';
         }
         
         return false;
@@ -62,10 +104,11 @@ class Hamnaghsheh_Users
     }
 
     /**
-     * Check if user is premium
+     * Check if user is premium or enterprise
+     * Updated by soroush - 12/02/2025
      * 
      * @param int|null $user_id User ID to check, defaults to current user
-     * @return bool True if premium, false otherwise
+     * @return bool True if premium or enterprise, false otherwise
      */
     public static function is_premium_user($user_id = null)
     {
@@ -80,16 +123,39 @@ class Hamnaghsheh_Users
             $user_id
         ));
         
-        // Return true if premium, false otherwise (including null/not found)
-        return ($access_level === 'premium');
+        // ✅ Return true if premium OR enterprise
+        return in_array($access_level, ['premium', 'enterprise']);
     }
 
     /**
-     * Get user access level (free or premium)
-     * Added by soroush - 11/12/2025
+     * Check if user is enterprise level
+     * Added by soroush - 12/02/2025
      * 
      * @param int|null $user_id User ID to check, defaults to current user
-     * @return string Access level ('free' or 'premium')
+     * @return bool True if enterprise, false otherwise
+     */
+    public static function is_enterprise_user($user_id = null)
+    {
+        if ($user_id === null) {
+            $user_id = get_current_user_id();
+        }
+        
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'hamnaghsheh_users';
+        $access_level = $wpdb->get_var($wpdb->prepare(
+            "SELECT access_level FROM $table_name WHERE user_id = %d ORDER BY id DESC LIMIT 1",
+            $user_id
+        ));
+        
+        return ($access_level === 'enterprise');
+    }
+
+    /**
+     * Get user access level (free, premium, or enterprise)
+     * Updated by soroush - 12/02/2025
+     * 
+     * @param int|null $user_id User ID to check, defaults to current user
+     * @return string Access level ('free', 'premium', or 'enterprise')
      */
     public static function get_user_access_level($user_id = null)
     {
@@ -129,9 +195,9 @@ class Hamnaghsheh_Users
         
         if (!$user_data) {
             return [
-                'storage_limit' => 52428800, // 50MB default
+                'storage_limit' => 0, // ✅ Changed: Free users have 0 storage
                 'access_level' => 'free',
-                'active' => 1
+                'active' => 0 // ✅ Changed: Default to inactive
             ];
         }
         
