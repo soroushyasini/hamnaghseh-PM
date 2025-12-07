@@ -48,3 +48,23 @@
     border-radius: 6px;
     cursor: pointer;
 }
+
+/* ============================================
+   HIDE ALL SHARE LINKS EXCEPT THE MOST RECENT ONE
+   ============================================ */
+
+/* Hide all link cards by default */
+#share-links-list .grid > div {
+  display: none;
+}
+
+/* Show only the first card (most recent one) */
+#share-links-list .grid > div:nth-child(1) {
+  display: block;
+}
+
+/* Remove scroll container since we only show 1 item */
+#share-links-list .grid {
+  max-height: none !important;
+  overflow-y: visible !important;
+}

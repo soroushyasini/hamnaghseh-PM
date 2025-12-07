@@ -38,8 +38,18 @@ $projects = Hamnaghsheh_Projects::get_user_projects($current_user->ID);
     </a>
     <a href="<?php echo get_site_url() . '/my-account/orders'; ?>"
         class="mb-4 block text-white hover:text-[#FFCF00] text-sm truncate transition-colors outline-none">
-        خدمات خریداری شده
+        خرید ها
     </a>
+    
+    
+    <?php
+$logout_url = wc_get_account_endpoint_url('customer-logout');
+?>
+<a href="<?php echo esc_url($logout_url); ?>"
+   class="mb-4 block text-white hover:text-[#FFCF00] text-sm truncate transition-colors outline-none"
+   onclick="return confirm('آیا مطمئن هستید که می‌خواهید خارج شوید؟');">
+    خروج از حساب
+</a>
     <!-- پروژه‌ها -->
     <div class="w-full text-right mb-10">
         <h3 class="text-sm font-semibold mb-2 text-[#FFCF00] border-b border-[#FFCF00]/40 pb-1">پروژه‌ها</h3>

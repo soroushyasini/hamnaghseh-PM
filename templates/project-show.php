@@ -9,6 +9,38 @@ $can_upload = in_array($permission, ['owner', 'upload']);
 
 $can_manage = ($permission === 'owner');
 
+function gregorian_to_jalali($gy,$gm,$gd){
+  $g_d_m = [0,31,59,90,120,151,181,212,243,273,304,334];
+  $gy2 = ($gm > 2)?($gy + 1):$gy;
+  $days = 355666 + (365 * $gy) + (int)(($gy2 + 3) / 4) - (int)(($gy2 + 99) / 100) + (int)(($gy2 + 399) / 400) + $gd + $g_d_m[$gm - 1];
+  $jy = -1595 + (33 * (int)($days / 12053));
+  $days %= 12053;
+  $jy += 4 * (int)($days / 1461);
+  $days %= 1461;
+  if ($days > 365) {
+    $jy += (int)(($days - 1) / 365);
+    $days = ($days - 1) % 365;
+  }
+  $jm = ($days < 186) ? 1 + (int)($days / 31) : 7 + (int)(($days - 186) / 30);
+  $jd = 1 + (($days < 186) ? ($days % 31) : (($days - 186) % 30));
+  return [$jy, $jm, $jd];
+}
+
+function jalaliDate($datetime) {
+    $timestamp = strtotime($datetime);
+    list($gy, $gm, $gd) = explode('-', date('Y-m-d', $timestamp));
+    list($jy, $jm, $jd) = gregorian_to_jalali($gy, $gm, $gd);
+
+    // تبدیل به اعداد فارسی
+    $farsi_digits = ['۰','۱','۲','۳','۴','۵','۶','۷','۸','۹'];
+    $english_digits = ['0','1','2','3','4','5','6','7','8','9'];
+
+    $date = sprintf('%04d/%02d/%02d', $jy, $jm, $jd);
+    $date = str_replace($english_digits, $farsi_digits, $date);
+
+    return $date;
+}
+
 ?>
 
 <div class="wrap hamnaghsheh-dashboard rounded-2xl p-5 lg:p-10">
@@ -41,22 +73,30 @@ $can_manage = ($permission === 'owner');
       <?php endif; ?>
 
       <?php if ($can_upload): ?>
-
-        <form action="<?php echo esc_url(admin_url('admin-post.php')); ?>" method="post" enctype="multipart/form-data"
-          class="relative">
-          <input type="hidden" name="action" value="hamnaghsheh_upload_file">
-          <input type="hidden" name="project_id" value="<?php echo esc_attr($project->id); ?>">
-
-          <label
-            class="border-2 border-dashed border-[#09375B] rounded-2xl bg-[#F8FAFC] p-10 text-center mb-6 hover:bg-[#f2f6fb] transition block cursor-pointer relative overflow-hidden">
-            <p class="text-[#09375B] font-semibold mb-2">فایل‌های خود را بکشید و در اینجا رها کنید</p>
-            <p class="text-sm text-gray-500">یا برای انتخاب فایل‌ها کلیک کنید</p>
-
-            <!-- ورودی فایل با شفافیت کامل -->
-            <input type="file" name="file" required class="absolute inset-0 opacity-0 cursor-pointer"
-              onchange="this.form.submit()">
-          </label>
-        </form>
+            <form action="<?php echo esc_url(admin_url('admin-post.php')); ?>" method="post" enctype="multipart/form-data"
+                  class="relative upload-form">
+              <input type="hidden" name="action" value="hamnaghsheh_upload_file">
+              <input type="hidden" name="project_id" value="<?php echo esc_attr($project->id); ?>">
+            
+              <label
+                class="border-2 border-dashed border-[#09375B] rounded-2xl bg-[#F8FAFC] p-10 text-center mb-6 hover:bg-[#f2f6fb] transition block cursor-pointer relative overflow-hidden upload-label">
+                <p class="text-[#09375B] font-semibold mb-2">فایل‌های خود را بکشید و در اینجا رها کنید</p>
+                <p class="text-sm text-gray-500">یا برای انتخاب فایل‌ها کلیک کنید</p>
+            
+                <input type="file" name="file" required class="absolute inset-0 opacity-0 cursor-pointer file-input">
+              </label>
+            
+              <div class="upload-loading absolute inset-0 flex items-center justify-center bg-white/70 hidden rounded-2xl">
+                <div class="flex flex-col items-center">
+                  <svg class="animate-spin h-6 w-6 text-[#09375B]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor"
+                          d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 00-8 8h4z"></path>
+                  </svg>
+                  <p class="mt-2 text-[#09375B] font-medium text-sm">در حال آپلود...</p>
+                </div>
+              </div>
+            </form>
       <?php endif; ?>
 
       <div class="flex flex-col lg:flex-row justify-between mb-8 space-y-1 lg:space-y-0">
@@ -115,17 +155,21 @@ $can_manage = ($permission === 'owner');
                 echo "<div class='grid grid-cols-1 gap-4' style='max-height: 200px;overflow-y: scroll;'>";
                 foreach ($links as $link) {
                   $url = site_url("/share/$link->token");
+                  $date = jalaliDate($link->created_at);
                   $permision = $link->permission == 'upload' ? 'دسترسی کامل' : 'فقط مشاهده';
-                  echo "<div class='bg-white border border-gray-200 rounded-xl p-4 shadow-sm hover:shadow-md transition-all duration-200'>
+                  echo "<div class='bg-white border border-gray-500 rounded-xl p-4 shadow-sm hover:shadow-md transition-all duration-200'>
                           <div class='flex items-center justify-between mb-2'>
                             <span class='text-sm font-medium text-gray-700'>لینک اشتراک ($permision)</span>
+                            <span class='text-xs'>$date</span>
+                          </div>
+                          <div>
+                            <a href='$url' target='_blank' class='block text-blue-600 text-sm font-semibold truncate hover:underline mb-3'>$url</a>
                             <button 
                               onclick=\"copyToClipboard('$url', this)\" 
                               class='text-xs bg-blue-100 text-blue-700 ouline-none px-3 py-1 rounded-lg hover:bg-blue-200 transition-all duration-150'>
                               کپی
                             </button>
                           </div>
-                          <a href='$url' target='_blank' class='block text-blue-600 text-sm font-semibold truncate hover:underline mb-3'>$url</a>
                         </div>
                   ";
                 }
@@ -164,10 +208,29 @@ $can_manage = ($permission === 'owner');
                   </td>
                   <td class="py-3 px-4 flex flex-wrap gap-2 justify-center">
                     <?php if ($can_upload): ?>
-                      <a href="<?php echo esc_url(home_url($f['file_path'])); ?>" download onclick="logDownload(<?php echo intval($f['id']); ?>, <?php echo intval($project->id); ?>)"
+                      <a href="<?php echo esc_url($f['file_path']); ?>" download onclick="logDownload(<?php echo intval($f['id']); ?>, <?php echo intval($project->id); ?>)"
                         class="bg-[#FFCF00] hover:bg-[#e6bd00] text-[#09375B] px-3 py-1 rounded-lg text-xs font-semibold transition flex items-center justify-center">دانلود</a>
                     <?php endif; ?>
-                    <a href="#" class="bg-slate-800 hover:bg-slate-900 text-white px-3 py-1 rounded-lg text-xs font-semibold transition flex items-center justify-center"  onclick="logSee(<?php echo intval($f['id']); ?>, <?php echo intval($project->id); ?>)">مشاهده</a>
+        
+                    <?php 
+                    $ext = strtolower(pathinfo($f['file_path'], PATHINFO_EXTENSION));
+                    $txt_url = 'https://hamnaghsheh.ir/txt-viewer/?file=' . $f['file_path'];
+                    $cad_url = 'https://hamnaghsheh.ir/dwg-viewer/?file=' . $f['file_path'];
+                    if ($ext === 'txt') {
+                        $final_url = $txt_url;
+                        ?>
+                        <a target="_blank" href="<?php echo $final_url; ?>" class="bg-slate-800 hover:bg-slate-900 text-white px-3 py-1 rounded-lg text-xs font-semibold transition flex items-center justify-center"  onclick="logSee(<?php echo intval($f['id']); ?>, <?php echo intval($project->id); ?>)">مشاهده</a>
+                        <?php
+                    } elseif ($ext === 'dwg' || $ext === 'dxf') {
+                        $final_url = $cad_url;
+                        ?>
+                         <a target="_blank" href="<?php echo $final_url; ?>" class="bg-slate-800 hover:bg-slate-900 text-white px-3 py-1 rounded-lg text-xs font-semibold transition flex items-center justify-center"  onclick="logSee(<?php echo intval($f['id']); ?>, <?php echo intval($project->id); ?>)">مشاهده</a>
+                    <?php
+                        
+                    } else {
+                        $final_url = null;
+                    }
+                    ?>
                     <?php if ($can_manage): ?>
                       <button onclick="openFileLogsModal(<?php echo $f['id']; ?>)"
                         class="bg-[#09375B] hover:bg-[#072c48] text-white px-3 py-1 rounded-lg text-xs font-semibold transition flex items-center justify-center">سوابق</button>

@@ -103,20 +103,28 @@ class Hamnaghsheh_File_Upload
             wp_redirect(home_url('/show-project/?id=' . $project_id));
             exit;
         }
-
-        if (!move_uploaded_file($file['tmp_name'], $file_path)) {
-            $_SESSION['alert'] = ['type' => 'error', 'message' => 'آپلود فایل با خطا مواجه شد.'];
-            wp_redirect(home_url('/show-project/?id=' . $project_id));
-            exit;
+        
+        $minio = Hamnaghsheh_Minio::instance();
+        $response = $minio->upload($file['tmp_name'], $file['name']);
+        
+        $relative_path = '';
+        $key = '';
+        if ($response['success']) {
+            
+            $relative_path = $response['url'];
+            
+            $key = $response['key'];
+            
+        } else {
+             $_SESSION['alert'] = ['type' => 'error', 'message' => $response['error']];
+             wp_redirect(home_url('/show-project/?id=' . $project_id));
         }
-
-        $relative_path = str_replace(ABSPATH, '/', $file_path);
-        $relative_path = preg_replace('#^/+#', '/', $relative_path);
 
         $wpdb->insert($table_files, [
             'project_id' => $project_id,
             'user_id' => $user_id,
             'file_name' => $file_name,
+            'key_file' => $key,
             'file_path' => $relative_path,
             'file_size' => $new_file_size,
             'file_type' => $file['type'],
@@ -170,12 +178,22 @@ class Hamnaghsheh_File_Upload
             wp_redirect(home_url('/show-project/?id=' . $project_id));
             exit;
         }
-
+        
+            // added by soroush 11/12/2025///////////
+           // ✅NEW: Check if user is premium before allowing delete
+        if (!Hamnaghsheh_Users::is_premium_user($user_id)) {
+            $_SESSION['alert'] = [
+                'type' => 'error', 
+                'message' => ' حذف فایل فقط برای کاربران پرمیوم امکان‌پذیر است. برای ارتقا به پرمیوم، تیکت بزنید.'
+            ];
+            wp_redirect(home_url('/show-project/?id=' . $project_id));
+            exit;
+        }
+        /////////////////////////////////////
         // حذف از پوشه
-        $upload_dir = wp_upload_dir();
-        $absolute_path = $upload_dir['basedir'] . $file->file_path;
-        if (file_exists($absolute_path))
-            unlink($absolute_path);
+            
+        $minio = Hamnaghsheh_Minio::instance();
+        $result = $minio->delete($file->key_file);
 
         $wpdb->delete($table_files, ['id' => $file_id], ['%d']);
         $wpdb->insert(
@@ -242,60 +260,68 @@ class Hamnaghsheh_File_Upload
             wp_redirect(home_url('/show-project/?id=' . $project_id));
             exit;
         }
-
-
+        
+        
+        // ✅NEW: Check if user is premium before allowing replace
+        // Only check for project owner, not for assigned users
+        if ($is_owner && !Hamnaghsheh_Users::is_premium_user($user_id)) {
+            $_SESSION['alert'] = [
+                'type' => 'error', 
+                'message' => '⚠️ جایگزینی فایل فقط برای کاربران پرمیوم امکان‌پذیر است. برای ارتقا به پرمیوم، با مدیر تماس بگیرید.'
+            ];
+            wp_redirect(home_url('/show-project/?id=' . $project_id));
+            exit;
+        }
+        
+        
         $old_file = $wpdb->get_row($wpdb->prepare("SELECT * FROM $table_files WHERE id = %d", $file_id));
         if (!$old_file) {
             $_SESSION['alert'] = ['type' => 'error', 'message' => 'فایل مورد نظر یافت نشد.'];
             wp_redirect(home_url('/show-project/?id=' . $project_id));
             exit;
         }
-
-        // مسیر ذخیره
-        $upload_dir = wp_upload_dir();
-        $project_dir = $upload_dir['basedir'] . '/hamnaghsheh/' . $project_id;
-        if (!file_exists($project_dir))
-            wp_mkdir_p($project_dir);
-
+        
         $file_name = sanitize_file_name($file['name']);
-        $file_path = $project_dir . '/' . $file_name;
-
+        
         $allowed_extensions = ['dwg', 'dxf', 'txt'];
         $file_ext = strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
-
+        
         if (!in_array($file_ext, $allowed_extensions)) {
             $_SESSION['alert'] = ['type' => 'error', 'message' => 'فرمت فایل مجاز نیست.'];
             wp_redirect(home_url('/show-project/?id=' . $project_id));
             exit;
         }
-
-        if (!move_uploaded_file($file['tmp_name'], $file_path)) {
-            $_SESSION['alert'] = ['type' => 'error', 'message' => 'آپلود فایل جدید ناموفق بود.'];
-            wp_redirect(home_url('/show-project/?id=' . $project_id));
-            exit;
+        
+        $minio = Hamnaghsheh_Minio::instance();
+        $result = $minio->delete($old_file->key_file);
+        
+        $response = $minio->upload($file['tmp_name'], $file['name']);
+        
+        $relative_path = '';
+        $key = '';
+        if ($response['success']) {
+            
+            $relative_path = $response['url'];
+            
+            $key = $response['key'];
+            
+        } else {
+             $_SESSION['alert'] = ['type' => 'error', 'message' => $response['error']];
+             wp_redirect(home_url('/show-project/?id=' . $project_id));
         }
-
-
-        $old_path = ABSPATH . ltrim($old_file->file_path, '/');
-        if (file_exists($old_path)) {
-            unlink($old_path);
-        }
-
-
-        $relative_path = str_replace(ABSPATH, '/', $file_path);
-        $relative_path = preg_replace('#^/+#', '/', $relative_path);
-
+        
         $wpdb->update(
             $table_files,
             [
                 'file_name' => $file_name,
                 'file_path' => $relative_path,
+                'key_file' => $key,
                 'file_size' => intval($file['size']),
                 'file_type' => $file['type'],
                 'uploaded_at' => current_time('mysql')
             ],
             ['id' => $file_id],
-            ['%s', '%s', '%d', '%s', '%s'],
+            ['%s', '%s', '%s', '%d', '%s', '%s'],
             ['%d']
         );
 

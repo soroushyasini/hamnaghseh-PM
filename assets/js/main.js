@@ -31,6 +31,8 @@ document.getElementById("share-form").onsubmit = async (e) => {
   }
 };
 
+
+
 // savabegh
 function translateActionType(action) {
   switch (action) {
@@ -207,9 +209,37 @@ function logSee(fileId, projectId) {
   .catch(() => console.warn("Ajax failed"));
 }
 
+
+document.addEventListener("DOMContentLoaded", () => {
+    const form = document.querySelector(".upload-form");
+    const fileInput = form.querySelector(".file-input");
+    const loading = form.querySelector(".upload-loading");
+    const label = form.querySelector(".upload-label");
+
+    let uploading = false;
+
+    fileInput.addEventListener("change", (e) => {
+      if (uploading) return; // جلوگیری از دوباره کلیک
+      uploading = true;
+
+      // نمایش لودر
+      loading.classList.remove("hidden");
+
+      // غیرفعال کردن کلیک مجدد بدون disable کردن input
+      label.style.pointerEvents = "none";
+      label.classList.add("opacity-50");
+
+      // ارسال فرم
+      form.submit();
+    });
+  });
+
 document.getElementById("open-share-popup").onclick = () => {
   document.getElementById("share-popup").classList.remove("hidden");
 };
 document.getElementById("close-share-popup").onclick = () => {
   document.getElementById("share-popup").classList.add("hidden");
 };
+
+
+///////// soroush updated 11/30/2025 ////

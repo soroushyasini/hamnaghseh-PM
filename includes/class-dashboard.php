@@ -2,18 +2,18 @@
 if (!defined('ABSPATH'))
     exit;
 
+
 class Hamnaghsheh_Dashboard
 {
 
     public static function render_shortcode()
     {
-
+        
         $msg = Hamnaghsheh_Users::ensure_user_access();
         if ($msg !== false) {
             return $msg;
         }
-
-        // دریافت لیست پروژه‌های کاربر برای نمایش در داشبورد
+        
         $projects = Hamnaghsheh_Projects::get_user_projects(Hamnaghsheh_Users::current_id());
         $archived_project = Hamnaghsheh_Projects::get_archived_project(Hamnaghsheh_Users::current_id());
 

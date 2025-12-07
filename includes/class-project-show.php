@@ -77,21 +77,39 @@ class Hamnaghsheh_Project_Show
             return '<div class="hamnaghsheh-notice text-red-800 bg-red-100 w-full p-4 rounded-lg text-md text-center">شما به این پروژه دسترسی ندارید</div>';
         }
 
-        // دریافت user_id مالک پروژه
-        $owner_id = $wpdb->get_var($wpdb->prepare("
-            SELECT user_id FROM $table_projects WHERE id = %d
-        ", $project_id));
+        // $owner_id = $wpdb->get_var($wpdb->prepare("
+        //     SELECT user_id FROM $table_projects WHERE id = %d
+        // ", $project_id));
+
+        // $result = $wpdb->get_row($wpdb->prepare("
+        //     SELECT 
+        //         COALESCE(SUM(f.file_size), 0) AS used_space,
+        //         u.storage_limit AS total_space
+        //     FROM $table_projects AS p
+        //     INNER JOIN $table_usersp AS u ON p.user_id = u.user_id
+        //     LEFT JOIN $table_files AS f ON p.id = f.project_id
+        //     WHERE p.user_id = %d
+        //     GROUP BY u.storage_limit
+        // ", $owner_id), ARRAY_A);
+
+        // $used_space = isset($result['used_space']) ? intval($result['used_space']) : 0;
+        // $total_space = isset($result['total_space']) ? intval($result['total_space']) : 52428800;
+
+        // $percent = $total_space > 0 ? min(100, round(($used_space / $total_space) * 100)) : 0;
 
         $result = $wpdb->get_row($wpdb->prepare("
             SELECT 
                 COALESCE(SUM(f.file_size), 0) AS used_space,
                 u.storage_limit AS total_space
-            FROM $table_projects AS p
-            INNER JOIN $table_usersp AS u ON p.user_id = u.user_id
-            LEFT JOIN $table_files AS f ON p.id = f.project_id
-            WHERE p.user_id = %d
+            FROM {$wpdb->prefix}hamnaghsheh_users AS u
+            LEFT JOIN {$wpdb->prefix}hamnaghsheh_projects AS p 
+                ON u.user_id = p.user_id
+            LEFT JOIN {$wpdb->prefix}hamnaghsheh_files AS f 
+                ON p.id = f.project_id
+            WHERE u.user_id = %d
+            AND p.user_id = %d
             GROUP BY u.storage_limit
-        ", $owner_id), ARRAY_A);
+        ", $current_user_id, $current_user_id), ARRAY_A);
 
         // اگر نتیجه خالی بود مقدار پیش‌فرض بده
         $used_space = isset($result['used_space']) ? intval($result['used_space']) : 0;
@@ -99,6 +117,8 @@ class Hamnaghsheh_Project_Show
 
         // محاسبه درصد مصرف
         $percent = $total_space > 0 ? min(100, round(($used_space / $total_space) * 100)) : 0;
+        
+        
 
         // فرمت خوانا
         $used_human = size_format($used_space);

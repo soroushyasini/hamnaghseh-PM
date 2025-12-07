@@ -76,7 +76,7 @@ class Hamnaghsheh_Share
         }
 
         if (!is_user_logged_in()) {
-            wp_redirect(home_url('/login/?redirect_to=' . urlencode(site_url('/share/' . $token))));
+            wp_redirect(home_url('/auth/?redirect_to=' . urlencode(site_url('/share/' . $token))));
             exit;
         }
 
@@ -86,7 +86,7 @@ class Hamnaghsheh_Share
     public function assign_project()
     {
         if (!is_user_logged_in()) {
-            wp_redirect(site_url("/login"));
+            wp_redirect(site_url("/auth"));
             exit;
         }
 

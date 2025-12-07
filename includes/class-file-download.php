@@ -8,6 +8,54 @@ class Hamnaghsheh_File_Download
     public function __construct()
     {
         add_action('wp_ajax_download_project_files', [$this, 'download_project_files']);
+        add_action('admin_post_hamnaghsheh_view_class',  [$this, 'view_class_handler']);
+        add_action('admin_post_nopriv_hamnaghsheh_view_class',  [$this, 'view_class_handler']);
+    }
+    
+    public function view_class_handler() {
+
+        $file_id = intval($_GET['file_id']);
+        $project_id = intval($_GET['project_id']);
+        global $wpdb;
+        $table_files = $wpdb->prefix . 'hamnaghsheh_files';
+        
+        $file_path = $wpdb->get_var(
+            $wpdb->prepare(
+                "SELECT file_path FROM $table_files WHERE id = %d LIMIT 1",
+                $file_id
+            )
+        );
+        
+        if ($file_path !== null) {
+            $ext = strtolower(pathinfo($file_path, PATHINFO_EXTENSION));
+            // ساخت آدرس کامل فايل
+            $full_file_url = 'https://hamnaghsheh.ir' . $file_path;
+            
+            // ساخت آدرسهاي مقصد
+            $txt_url = 'https://hamnaghsheh.ir/txt-viewer/?file=' . urlencode($full_file_url);
+            $cad_url = 'https://hamnaghsheh.ir/dwg-viewer/?file=' . urlencode($full_file_url);
+            
+            // انتخاب مقصد درست
+            if ($ext === 'txt') {
+                $final_url = $txt_url;
+            } elseif ($ext === 'dwg' || $ext === 'dxf') {
+                $final_url = $cad_url;
+            } else {
+                $final_url = null;
+            }
+            
+            if ($final_url) {
+                echo '<script>window.open("'.$final_url.'", "_blank");</script>';
+                exit;
+            } else {
+                echo 'پشتيباني نميشود';
+                exit;
+            }
+            // سطر وجود دارد
+        } else {
+            wp_redirect(home_url('/show-project/?id=' . $project_id));
+        }
+        exit;
     }
 
 

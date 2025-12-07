@@ -16,10 +16,15 @@ $role = false;
     <main class="flex-1">
       <div class="mb-5 xl:mb-8 flex items-center justify-between">
         <div class="flex-1">
-          <h1 class="font-black text-lg xl:text-2xl mb-3 text-[#09375B]">کارتابل من</h1>
+          <h1 class="font-black text-lg xl:text-2xl mb-3 text-[#09375B]">پرتال من</h1>
         </div>
         <div class="flex items-center justify-center gap-2">
-          <a href="<?php echo esc_url(site_url('/hamnaghsheh-purchase')); ?>"
+            
+                      <a href="<?php echo esc_url(site_url('/shop')); ?>"
+            class="border bg-transparent text-slate-900 px-4 py-2 rounded text-sm">
+            خدمات نقشه برداری
+          </a>
+          <a href="<?php echo esc_url(site_url('/plans')); ?>"
             class="border bg-transparent text-slate-900 px-4 py-2 rounded text-sm">
             خرید اشتراک
           </a>
@@ -31,7 +36,7 @@ $role = false;
       <hr class="border-gray-300 mb-5">
 
       <div class="rounded border border-slate-200">
-        <div class="flex items-center justify-between rounded-t bg-[#09375B]/10 p-2" role="alert">
+        <div class="flex items-center justify-between rounded-t bg-[#09375B]/10 p-2">
           <h2 class="text-md xl:text-xl font-bold text-[#09375B]">پروژه‌ها</h2>
         </div>
 
@@ -65,7 +70,7 @@ $role = false;
                     <div class="flex gap-2 flex-row-reverse items-center justify-start">
                       <?php
                       if ($p->is_owner) {
-                        echo '<button 
+                        echo '<button style="color:white;" 
                         onclick="openEditModal('
                           . '\'' . esc_js($p->id) . '\', '
                           . '\'' . esc_js($p->name) . '\', '

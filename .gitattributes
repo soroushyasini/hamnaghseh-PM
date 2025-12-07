@@ -1,0 +1,10 @@
+# Force consistent line endings for PHP and most text files
+.php   text eol=lf
+.js    text eol=lf
+.json  text eol=lf
+.yml   text eol=lf
+.yaml  text eol=lf
+.md    text eol=lf
+
+# Or use auto if you want Git to normalize to LF in repo but convert on checkout
+ text=auto

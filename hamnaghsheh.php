@@ -12,7 +12,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('HAMNAGHSHEH_VERSION', '0.2.4');
+define('HAMNAGHSHEH_VERSION', '0.2.7');
 define('HAMNAGHSHEH_DIR', plugin_dir_path(__FILE__));
 define('HAMNAGHSHEH_URL', plugin_dir_url(__FILE__));
 define('HAMNAGHSHEH_PREFIX', 'hamnaghsheh_');
@@ -104,6 +104,13 @@ add_action('template_redirect', function () {
         $handler = new Hamnaghsheh_Share();
         $_GET['token'] = $token;
         $handler->handle_share_access();
+        exit;
+    }
+});
+
+add_action('template_redirect', function () {
+    if (is_page('dashboard') && !is_user_logged_in()) {
+        wp_redirect(site_url('/auth?redirect_to=' . urlencode(site_url('/dashboard'))));
         exit;
     }
 });
