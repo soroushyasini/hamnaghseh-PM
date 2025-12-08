@@ -20,6 +20,8 @@ class Hamnaghsheh_Loader
     require_once HAMNAGHSHEH_DIR . 'includes/class-project-show.php';
     require_once HAMNAGHSHEH_DIR . 'includes/class-projects.php';
     require_once HAMNAGHSHEH_DIR . 'includes/class-utils.php';
+    require_once HAMNAGHSHEH_DIR . 'includes/class-file-validator.php';
+    require_once HAMNAGHSHEH_DIR . 'includes/class-trial-manager.php'; // ✅ NEW: Trial system
     require_once HAMNAGHSHEH_DIR . 'includes/class-upload-file.php';
     require_once HAMNAGHSHEH_DIR . 'includes/class-shares.php';
     require_once HAMNAGHSHEH_DIR . 'includes/class-auth.php';
@@ -28,7 +30,6 @@ class Hamnaghsheh_Loader
     require_once HAMNAGHSHEH_DIR . 'includes/class-user-setting.php';
     require_once HAMNAGHSHEH_DIR . 'includes/class-pages.php';
     require_once HAMNAGHSHEH_DIR . 'includes/class-minio.php';
-    require_once HAMNAGHSHEH_DIR . 'includes/class-file-validator.php';
 
     new Hamnaghsheh_Users();
     new Hamnaghsheh_File_Upload();
@@ -38,6 +39,7 @@ class Hamnaghsheh_Loader
     new Hamnaghsheh_File_Download();
     new Hamnaghsheh_User_Settings();
     new Hamnaghsheh_Pages();
+    new Hamnaghsheh_Trial_Manager(); // ✅ NEW: Initialize trial system
 
     add_action('wp_enqueue_scripts', [$this, 'tailwind_assets']);
   }

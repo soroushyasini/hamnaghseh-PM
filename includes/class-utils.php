@@ -37,7 +37,7 @@ class Hamnaghsheh_Utils
     {
         $labels = [
             'free' => 'رایگان',
-            'premium' => 'شخصی',
+            'premium' => 'پرمیوم',
             'enterprise' => 'سازمانی'
         ];
         return $labels[$access_level] ?? 'نامشخص';
@@ -232,14 +232,23 @@ class Hamnaghsheh_Utils
 
     /**
      * Check if user can perform action based on plan
-     * Added by soroush - 12/02/2025
+     * Updated by soroush - 12/08/2025 - Added trial support
      * 
      * @param string $action Action name (upload, delete, replace, archive)
      * @param string $access_level User access level
+     * @param int|null $user_id User ID (to check trial)
      * @return bool True if allowed
      */
-    public static function can_perform_action($action, $access_level)
+    public static function can_perform_action($action, $access_level, $user_id = null)
     {
+        // ✅ Check if free user has active trial
+        if ($access_level === 'free' && $user_id && class_exists('Hamnaghsheh_Trial_Manager')) {
+            if (Hamnaghsheh_Trial_Manager::is_trial_active($user_id)) {
+                // Trial users can do everything premium users can
+                return true;
+            }
+        }
+        
         $plans = self::get_plan_features();
         
         if (!isset($plans[$access_level])) {

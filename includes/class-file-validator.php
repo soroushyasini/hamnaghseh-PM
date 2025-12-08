@@ -11,14 +11,24 @@ class Hamnaghsheh_File_Validator
 {
     /**
      * Get allowed file extensions based on user access level
+     * Updated by soroush - 12/08/2025 - Added trial support
      * 
      * @param string $access_level User's access level (free, premium, enterprise)
+     * @param int|null $user_id User ID (to check trial status)
      * @return array Array of allowed extensions
      */
-    public static function get_allowed_extensions($access_level)
+    public static function get_allowed_extensions($access_level, $user_id = null)
     {
+        // ✅ Check if free user has active trial
+        if ($access_level === 'free' && $user_id && class_exists('Hamnaghsheh_Trial_Manager')) {
+            if (Hamnaghsheh_Trial_Manager::is_trial_active($user_id)) {
+                // Trial users get same formats as premium
+                return ['dwg', 'dxf', 'txt'];
+            }
+        }
+        
         $extensions = [
-            'free' => [], // Free users cannot upload any files
+            'free' => [], // Free users without trial cannot upload
             'premium' => ['dwg', 'dxf', 'txt'],
             'enterprise' => ['dwg', 'dxf', 'txt', 'pdf', 'png', 'jpg', 'jpeg']
         ];
@@ -28,6 +38,7 @@ class Hamnaghsheh_File_Validator
 
     /**
      * Check if user can upload files
+     * Updated by soroush - 12/08/2025 - Added trial support
      * 
      * @param int|null $user_id User ID to check
      * @return array ['can_upload' => bool, 'message' => string, 'access_level' => string]
@@ -40,10 +51,21 @@ class Hamnaghsheh_File_Validator
 
         $access_level = Hamnaghsheh_Users::get_user_access_level($user_id);
 
+        // ✅ Check if free user has active trial
         if ($access_level === 'free') {
+            if (class_exists('Hamnaghsheh_Trial_Manager') && Hamnaghsheh_Trial_Manager::is_trial_active($user_id)) {
+                // Trial user can upload
+                return [
+                    'can_upload' => true,
+                    'message' => '',
+                    'access_level' => 'free_trial'
+                ];
+            }
+            
+            // Free user without trial
             return [
                 'can_upload' => false,
-                'message' => '⚠️ کاربران رایگان امکان آپلود فایل ندارند. شما فقط می‌توانید به پروژه‌های دیگران دعوت شوید و فایل‌ها را مشاهده کنید. برای آپلود فایل، لطفاً به پلن شخصی ارتقا دهید.',
+                'message' => '⚠️ کاربران رایگان امکان آپلود فایل ندارند. برای آپلود فایل، دوره آزمایشی 14 روزه را فعال کنید یا اشتراک تهیه نمایید.',
                 'access_level' => $access_level
             ];
         }
@@ -77,7 +99,7 @@ class Hamnaghsheh_File_Validator
         if (empty($allowed_extensions)) {
             return [
                 'valid' => false,
-                'message' => '⚠️ کاربران رایگان امکان آپلود فایل ندارند. برای ارتقا به پلن شخصی با پشتیبانی تماس بگیرید.',
+                'message' => '⚠️ کاربران رایگان امکان آپلود فایل ندارند. برای ارتقا به پلن پرمیوم با مدیر تماس بگیرید.',
                 'extension' => $file_ext
             ];
         }
@@ -90,7 +112,7 @@ class Hamnaghsheh_File_Validator
                 return [
                     'valid' => false,
                     'message' => sprintf(
-                        '⚠️ فرمت فایل %s برای کاربران شخصی مجاز نیست. فرمت‌های مجاز: %s. برای آپلود فایل‌های PDF, PNG, JPG به پلن سازمانی ارتقا دهید.',
+                        '⚠️ فرمت فایل %s برای کاربران پرمیوم مجاز نیست. فرمت‌های مجاز: %s. برای آپلود فایل‌های PDF, PNG, JPG به پلن سازمانی ارتقا دهید.',
                         strtoupper($file_ext),
                         $allowed_str
                     ),
@@ -224,17 +246,17 @@ class Hamnaghsheh_File_Validator
     {
         $messages = [
             'upload' => [
-                'free' => '⚠️ آپلود فایل فقط برای کاربران شخصی و سازمانی امکان‌پذیر است. برای ارتقا با پشتیبانی تماس بگیرید.',
+                'free' => '⚠️ آپلود فایل فقط برای کاربران پرمیوم و سازمانی امکان‌پذیر است. برای ارتقا با مدیر تماس بگیرید.',
                 'premium' => 'شما می‌توانید فایل‌های DWG, DXF, TXT آپلود کنید. برای فرمت‌های بیشتر به پلن سازمانی ارتقا دهید.'
             ],
             'delete' => [
-                'free' => '⚠️ حذف فایل فقط برای کاربران شخصی و سازمانی امکان‌پذیر است. برای ارتقا با پشتیبانی تماس بگیرید.'
+                'free' => '⚠️ حذف فایل فقط برای کاربران پرمیوم و سازمانی امکان‌پذیر است. برای ارتقا با مدیر تماس بگیرید.'
             ],
             'replace' => [
-                'free' => '⚠️ جایگزینی فایل فقط برای کاربران شخصی و سازمانی امکان‌پذیر است. برای ارتقا با پشتیبانی تماس بگیرید.'
+                'free' => '⚠️ جایگزینی فایل فقط برای کاربران پرمیوم و سازمانی امکان‌پذیر است. برای ارتقا با مدیر تماس بگیرید.'
             ],
             'archive' => [
-                'free' => '⚠️ آرشیو پروژه فقط برای کاربران شخصی و سازمانی امکان‌پذیر است. برای ارتقا با پشتیبانی تماس بگیرید.'
+                'free' => '⚠️ آرشیو پروژه فقط برای کاربران پرمیوم و سازمانی امکان‌پذیر است. برای ارتقا با مدیر تماس بگیرید.'
             ]
         ];
 
@@ -242,6 +264,6 @@ class Hamnaghsheh_File_Validator
             return $messages[$feature][$current_level];
         }
 
-        return '⚠️ این امکان برای شما محدود است. برای ارتقا با پشتیبانی تماس بگیرید.';
+        return '⚠️ این امکان برای شما محدود است. برای ارتقا با مدیر تماس بگیرید.';
     }
 }

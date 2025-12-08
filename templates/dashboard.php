@@ -40,28 +40,8 @@ $is_admin = current_user_can('manage_options');
       </div>
       <hr class="border-gray-300 mb-5">
 
-      <!-- ✅ NEW: Free User Upgrade Notice -->
-      <?php if ($access_level === 'free'): ?>
-        <div class="mb-5 p-4 bg-blue-50 border-r-4 border-blue-500 rounded-lg">
-          <div class="flex items-start">
-            <div class="flex-shrink-0">
-              <svg class="h-5 w-5 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
-              </svg>
-            </div>
-            <div class="mr-3 flex-1">
-              <h3 class="text-sm font-semibold text-blue-800">شما در حال استفاده از پکیج رایگان هستید</h3>
-              <p class="text-xs text-blue-700 mt-1">
-                با ارتقا به پکیج شخصی، امکان آپلود فایل، آرشیو پروژه و ۱۰۰ مگابایت فضای ذخیره‌سازی دریافت کنید.
-              </p>
-              <a href="<?php echo esc_url(site_url('/plans')); ?>" 
-                 class="inline-block mt-2 text-xs font-semibold text-blue-600 hover:text-blue-800 hover:underline">
-                مشاهده پکیج‌ها و ارتقا ←
-              </a>
-            </div>
-          </div>
-        </div>
-      <?php endif; ?>
+      <!-- ✅ NEW: Trial Banner (replaces free user upgrade notice) -->
+      <?php include plugin_dir_path(__FILE__) . 'trial-banner.php'; ?>
 
       <div class="rounded border border-slate-200">
         <div class="flex items-center justify-between rounded-t bg-[#09375B]/10 p-2">

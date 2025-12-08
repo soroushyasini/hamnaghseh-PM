@@ -113,8 +113,11 @@ class Hamnaghsheh_Project_Show
 
         // اگر نتیجه خالی بود مقدار پیش‌فرض بده
         $used_space = isset($result['used_space']) ? intval($result['used_space']) : 0;
-        $total_space = isset($result['total_space']) ? intval($result['total_space']) : 52428800;
-
+        // $total_space = isset($result['total_space']) ? intval($result['total_space']) : 0; #changed to zerom like dashbard.php logic - 9 dec 00:45
+        // ✅ FIXED: Get storage limit directly from user table
+        // This works even if user has no projects
+        $storage_info = Hamnaghsheh_Users::get_user_storage_info($current_user_id);
+        $total_space = intval($storage_info['storage_limit']);
         // محاسبه درصد مصرف
         $percent = $total_space > 0 ? min(100, round(($used_space / $total_space) * 100)) : 0;
         
