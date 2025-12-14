@@ -1,0 +1,212 @@
+/* Admin Order Management Styles */
+
+.wrap[dir="rtl"] {
+    direction: rtl;
+    text-align: right;
+}
+
+.wrap[dir="rtl"] .wp-list-table th,
+.wrap[dir="rtl"] .wp-list-table td {
+    text-align: right;
+}
+
+.wrap[dir="rtl"] .form-table th {
+    text-align: right;
+    padding-right: 0;
+    padding-left: 10px;
+}
+
+/* Order Status Indicators */
+.order-status-indicator {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-left: 5px;
+}
+
+.order-status-indicator.pending {
+    background-color: #999;
+}
+
+.order-status-indicator.reviewed {
+    background-color: #2196f3;
+}
+
+.order-status-indicator.quoted {
+    background-color: #ff9800;
+}
+
+.order-status-indicator.paid {
+    background-color: #4caf50;
+}
+
+.order-status-indicator.cancelled {
+    background-color: #f44336;
+}
+
+/* Admin Order Detail Grid */
+.admin-order-detail-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 20px;
+}
+
+@media (max-width: 1024px) {
+    .admin-order-detail-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Message Thread */
+.admin-message-thread {
+    max-height: 400px;
+    overflow-y: auto;
+    padding: 10px;
+    background: #f5f5f5;
+    border-radius: 4px;
+}
+
+.admin-message-item {
+    margin-bottom: 15px;
+    padding: 10px;
+    border-radius: 4px;
+}
+
+.admin-message-item.from-admin {
+    background: #e3f2fd;
+}
+
+.admin-message-item.from-user {
+    background: #f1f8e9;
+}
+
+/* Activity Timeline */
+.activity-timeline {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.activity-item {
+    margin-bottom: 15px;
+    padding-right: 10px;
+    position: relative;
+}
+
+.activity-item::before {
+    content: '';
+    position: absolute;
+    right: -3px;
+    top: 0;
+    width: 3px;
+    height: 100%;
+}
+
+.activity-item.admin-action::before {
+    background-color: #2196f3;
+}
+
+.activity-item.user-action::before {
+    background-color: #4caf50;
+}
+
+/* Comparison Table */
+.comparison-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 10px 0;
+}
+
+.comparison-table th,
+.comparison-table td {
+    padding: 8px;
+    border: 1px solid #ddd;
+    text-align: right;
+}
+
+.comparison-table th {
+    background: #f5f5f5;
+    font-weight: 600;
+}
+
+.comparison-table .highlight {
+    background: #fff3cd;
+}
+
+/* Filter Bar */
+.orders-filter-bar {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+    margin: 20px 0;
+}
+
+.orders-filter-bar select,
+.orders-filter-bar input {
+    height: 32px;
+}
+
+/* Quick Actions */
+.quick-actions {
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+}
+
+.quick-actions .button {
+    padding: 4px 8px;
+    height: auto;
+    line-height: 1.4;
+}
+
+/* Unread Message Badge */
+.unread-badge {
+    background: #f44336;
+    color: white;
+    border-radius: 10px;
+    padding: 2px 6px;
+    font-size: 11px;
+    font-weight: bold;
+    margin-right: 5px;
+}
+
+/* Scrollbar Styling */
+.admin-message-thread::-webkit-scrollbar,
+.activity-timeline::-webkit-scrollbar {
+    width: 8px;
+}
+
+.admin-message-thread::-webkit-scrollbar-track,
+.activity-timeline::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.admin-message-thread::-webkit-scrollbar-thumb,
+.activity-timeline::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+.admin-message-thread::-webkit-scrollbar-thumb:hover,
+.activity-timeline::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* Print Styles for Admin */
+@media print {
+    .postbox-header,
+    .page-title-action,
+    .tablenav,
+    .quick-actions,
+    button,
+    .button {
+        display: none !important;
+    }
+
+    .postbox {
+        border: 1px solid #ddd !important;
+        box-shadow: none !important;
+    }
+}
