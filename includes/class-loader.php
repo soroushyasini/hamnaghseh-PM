@@ -30,6 +30,14 @@ class Hamnaghsheh_Loader
     require_once HAMNAGHSHEH_DIR . 'includes/class-user-setting.php';
     require_once HAMNAGHSHEH_DIR . 'includes/class-pages.php';
     require_once HAMNAGHSHEH_DIR . 'includes/class-minio.php';
+    
+    // Order management system
+    require_once HAMNAGHSHEH_DIR . 'includes/class-services.php';
+    require_once HAMNAGHSHEH_DIR . 'includes/class-orders.php';
+    require_once HAMNAGHSHEH_DIR . 'includes/class-order-messages.php';
+    require_once HAMNAGHSHEH_DIR . 'includes/class-order-activity.php';
+    require_once HAMNAGHSHEH_DIR . 'includes/admin/class-admin-services.php';
+    require_once HAMNAGHSHEH_DIR . 'includes/admin/class-admin-orders.php';
 
     new Hamnaghsheh_Users();
     new Hamnaghsheh_File_Upload();
@@ -40,6 +48,16 @@ class Hamnaghsheh_Loader
     new Hamnaghsheh_User_Settings();
     new Hamnaghsheh_Pages();
     new Hamnaghsheh_Trial_Manager(); // ✅ NEW: Initialize trial system
+    
+    // Initialize order management system
+    new Hamnaghsheh_Services();
+    new Hamnaghsheh_Orders();
+    
+    // Initialize admin classes if in admin
+    if (is_admin()) {
+      new Hamnaghsheh_Admin_Services();
+      new Hamnaghsheh_Admin_Orders();
+    }
 
     add_action('wp_enqueue_scripts', [$this, 'tailwind_assets']);
   }
