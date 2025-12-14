@@ -1,0 +1,291 @@
+/**
+ * Admin Order Management JavaScript
+ */
+
+(function($) {
+    'use strict';
+
+    // Helper function to format numbers
+    function formatNumber(num) {
+        return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    }
+
+    // Set loading state for buttons
+    function setButtonLoading(button, isLoading, originalText) {
+        if (isLoading) {
+            button.prop('disabled', true);
+            button.data('original-text', button.text());
+            button.text('در حال پردازش...');
+        } else {
+            button.prop('disabled', false);
+            button.text(originalText || button.data('original-text') || button.text());
+        }
+    }
+
+    // Confirm dialog wrapper
+    function confirmAction(message) {
+        return confirm(message || 'آیا از انجام این عملیات اطمینان دارید؟');
+    }
+
+    // Show admin notification
+    function showNotification(message, type) {
+        const noticeClass = type === 'success' ? 'notice-success' : 'notice-error';
+        const notice = $('<div class="notice ' + noticeClass + ' is-dismissible"><p>' + message + '</p></div>');
+        
+        $('.wrap > h1').after(notice);
+        
+        setTimeout(function() {
+            notice.fadeOut(function() {
+                $(this).remove();
+            });
+        }, 5000);
+    }
+
+    // AJAX error handler
+    function handleAjaxError(xhr, status, error) {
+        console.error('AJAX Error:', status, error);
+        showNotification('خطا در ارتباط با سرور. لطفاً دوباره تلاش کنید.', 'error');
+    }
+
+    // Real-time price calculation in admin quote form
+    if ($('#quote-form').length) {
+        function calculateQuotePrice() {
+            const selectedService = $('input[name="service_type"]:checked');
+            const quantity = parseInt($('#estimated-quantity').val()) || 1;
+            const standardPrice = parseFloat(selectedService.data('price')) || 0;
+            const priceType = $('input[name="price_type"]:checked').val();
+            let pricePerSession = standardPrice;
+
+            if (priceType === 'custom') {
+                pricePerSession = parseFloat($('#custom-price').val()) || 0;
+            }
+
+            const total = quantity * pricePerSession;
+
+            $('#standard-price').text(formatNumber(standardPrice));
+            $('#total-price').text(formatNumber(total) + ' تومان');
+            $('#final-price-per-session').val(pricePerSession);
+            $('#total-price-value').val(total);
+        }
+
+        $('input[name="service_type"], #estimated-quantity, input[name="price_type"], #custom-price')
+            .on('change input', calculateQuotePrice);
+
+        $('input[name="price_type"]').on('change', function() {
+            $('#custom-price').prop('disabled', $(this).val() !== 'custom');
+            if ($(this).val() === 'custom') {
+                $('#custom-price').focus();
+            }
+            calculateQuotePrice();
+        });
+
+        // Initialize
+        calculateQuotePrice();
+    }
+
+    // Bulk actions for orders list
+    if ($('.wp-list-table').length) {
+        $('#doaction, #doaction2').on('click', function(e) {
+            const action = $(this).siblings('select[name="action"]').val();
+            
+            if (action === '-1') {
+                e.preventDefault();
+                return false;
+            }
+
+            const checkedBoxes = $('.wp-list-table tbody input[type="checkbox"]:checked');
+            
+            if (checkedBoxes.length === 0) {
+                e.preventDefault();
+                alert('لطفاً حداقل یک سفارش را انتخاب کنید.');
+                return false;
+            }
+
+            if (!confirmAction('آیا از انجام این عملیات روی ' + checkedBoxes.length + ' سفارش اطمینان دارید؟')) {
+                e.preventDefault();
+                return false;
+            }
+        });
+    }
+
+    // Auto-refresh unread message count
+    function updateUnreadCounts() {
+        $('.unread-badge').each(function() {
+            const badge = $(this);
+            const orderId = badge.data('order-id');
+            
+            if (orderId) {
+                $.ajax({
+                    url: ajaxurl,
+                    type: 'POST',
+                    data: {
+                        action: 'hamnaghsheh_get_unread_count',
+                        order_id: orderId,
+                        for_admin: 1
+                    },
+                    success: function(response) {
+                        if (response.success && response.data.count > 0) {
+                            badge.text(response.data.count).show();
+                        } else {
+                            badge.hide();
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+    // Refresh unread counts every 30 seconds
+    if ($('.unread-badge').length) {
+        setInterval(updateUnreadCounts, 30000);
+    }
+
+    // Quick status change from orders list
+    $(document).on('click', '.quick-status-change', function(e) {
+        e.preventDefault();
+        
+        const orderId = $(this).data('order-id');
+        const newStatus = $(this).data('status');
+        
+        if (!confirmAction('آیا از تغییر وضعیت این سفارش اطمینان دارید؟')) {
+            return false;
+        }
+
+        $.ajax({
+            url: ajaxurl,
+            type: 'POST',
+            data: {
+                action: 'hamnaghsheh_admin_update_status',
+                nonce: $(this).data('nonce'),
+                order_id: orderId,
+                status: newStatus
+            },
+            beforeSend: function() {
+                showNotification('در حال بروزرسانی...', 'info');
+            },
+            success: function(response) {
+                if (response.success) {
+                    showNotification(response.data.message, 'success');
+                    setTimeout(function() {
+                        location.reload();
+                    }, 1000);
+                } else {
+                    showNotification(response.data.message, 'error');
+                }
+            },
+            error: handleAjaxError
+        });
+    });
+
+    // Export orders to CSV
+    $(document).on('click', '#export-orders-csv', function(e) {
+        e.preventDefault();
+        
+        const filters = {
+            status: $('select[name="status"]').val(),
+            service_type: $('select[name="service_type"]').val(),
+            search: $('input[name="s"]').val()
+        };
+
+        const queryString = $.param(filters);
+        window.location.href = ajaxurl + '?action=hamnaghsheh_export_orders&' + queryString;
+    });
+
+    // Scroll to latest message in admin thread
+    if ($('.admin-message-thread').length) {
+        const messageThread = $('.admin-message-thread');
+        messageThread.scrollTop(messageThread[0].scrollHeight);
+    }
+
+    // Highlight changed fields
+    $('.admin-order-detail-grid input, .admin-order-detail-grid textarea, .admin-order-detail-grid select')
+        .on('change', function() {
+            $(this).addClass('field-changed');
+        });
+
+    // Keyboard shortcuts
+    $(document).on('keydown', function(e) {
+        // Ctrl/Cmd + S to save (prevent default browser save)
+        if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+            e.preventDefault();
+            const activeForm = $('form:visible').first();
+            if (activeForm.length) {
+                activeForm.submit();
+            }
+        }
+
+        // ESC to close modals
+        if (e.key === 'Escape') {
+            $('.modal-overlay').fadeOut();
+        }
+    });
+
+    // Copy order number to clipboard
+    $(document).on('click', '.copy-order-number', function(e) {
+        e.preventDefault();
+        
+        const orderNumber = $(this).data('order-number');
+        const tempInput = $('<input>');
+        $('body').append(tempInput);
+        tempInput.val(orderNumber).select();
+        document.execCommand('copy');
+        tempInput.remove();
+        
+        showNotification('شماره سفارش کپی شد: ' + orderNumber, 'success');
+    });
+
+    // Auto-save draft notes
+    let autoSaveTimer;
+    $('textarea[name="admin_notes"]').on('input', function() {
+        clearTimeout(autoSaveTimer);
+        const notes = $(this).val();
+        const orderId = $('input[name="order_id"]').val();
+        
+        autoSaveTimer = setTimeout(function() {
+            // Auto-save to localStorage
+            localStorage.setItem('admin_notes_draft_' + orderId, notes);
+        }, 1000);
+    });
+
+    // Restore draft notes on page load
+    if ($('textarea[name="admin_notes"]').length) {
+        const orderId = $('input[name="order_id"]').val();
+        const savedNotes = localStorage.getItem('admin_notes_draft_' + orderId);
+        
+        if (savedNotes && !$('textarea[name="admin_notes"]').val()) {
+            if (confirm('یک پیش‌نویس ذخیره شده برای این سفارش یافت شد. آیا می‌خواهید آن را بازیابی کنید؟')) {
+                $('textarea[name="admin_notes"]').val(savedNotes);
+            } else {
+                localStorage.removeItem('admin_notes_draft_' + orderId);
+            }
+        }
+    }
+
+    // Clear draft after successful submission
+    $(document).on('ajaxSuccess', function(event, xhr, settings) {
+        if (settings.data && settings.data.indexOf('hamnaghsheh_admin_set_quote') > -1) {
+            const orderId = $('input[name="order_id"]').val();
+            localStorage.removeItem('admin_notes_draft_' + orderId);
+        }
+    });
+
+    // Initialize on document ready
+    $(document).ready(function() {
+        // Add confirmation to delete actions
+        $('.delete-order').on('click', function(e) {
+            if (!confirmAction('آیا از حذف این سفارش اطمینان دارید؟ این عملیات قابل بازگشت نیست.')) {
+                e.preventDefault();
+                return false;
+            }
+        });
+
+        // Enhance select2 for better UX (if available)
+        if ($.fn.select2) {
+            $('select[name="status"], select[name="service_type"]').select2({
+                width: '200px',
+                dir: 'rtl'
+            });
+        }
+    });
+
+})(jQuery);

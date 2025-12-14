@@ -36,6 +36,16 @@ class Hamnaghsheh_Admin_Services
     }
 
     /**
+     * Static callback for admin menu
+     */
+    public static function render_services_page_callback()
+    {
+        $services = Hamnaghsheh_Services::get_active_services();
+        
+        include HAMNAGHSHEH_DIR . 'templates/admin/services-settings.php';
+    }
+
+    /**
      * AJAX: Save service
      */
     public function ajax_save_service()

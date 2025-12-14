@@ -43,7 +43,7 @@ class Hamnaghsheh_Admin_Orders
             'تنظیمات خدمات',
             'manage_options',
             'hamnaghsheh-services',
-            array('Hamnaghsheh_Admin_Services', 'render_services_page')
+            array('Hamnaghsheh_Admin_Services', 'render_services_page_callback')
         );
 
         // Hidden submenu for single order

@@ -1,0 +1,125 @@
+/* Order Management Styles */
+
+.hamnaghsheh-services,
+.hamnaghsheh-order-form,
+.hamnaghsheh-my-orders,
+.hamnaghsheh-order-detail {
+    font-family: 'Vazirmatn', 'Vazir', sans-serif;
+}
+
+/* Service Cards */
+.service-card {
+    transition: all 0.3s ease;
+}
+
+.service-card:hover {
+    transform: translateY(-5px);
+}
+
+.quantity-minus,
+.quantity-plus {
+    min-width: 40px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.quantity-input {
+    -moz-appearance: textfield;
+}
+
+.quantity-input::-webkit-outer-spin-button,
+.quantity-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Order Cards */
+.order-card {
+    transition: all 0.3s ease;
+}
+
+.order-card:hover {
+    transform: translateY(-2px);
+}
+
+/* Status Badges */
+.status-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+/* Messages */
+.messages-container {
+    scroll-behavior: smooth;
+}
+
+.messages-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.messages-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.messages-container::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+.messages-container::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* Loading States */
+.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .hamnaghsheh-services .grid,
+    .hamnaghsheh-my-orders .space-y-4 {
+        gap: 1rem;
+    }
+
+    .service-card,
+    .order-card {
+        margin-bottom: 1rem;
+    }
+}
+
+/* Persian Number Support */
+.persian-number {
+    font-family: 'Vazirmatn', 'Vazir', sans-serif;
+}
+
+/* Animation for new messages */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.message-new {
+    animation: slideIn 0.3s ease;
+}
+
+/* Print Styles */
+@media print {
+    .order-actions,
+    .message-form,
+    button {
+        display: none;
+    }
+}
