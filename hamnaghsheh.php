@@ -113,4 +113,14 @@ add_action('template_redirect', function () {
         wp_redirect(site_url('/auth?redirect_to=' . urlencode(site_url('/dashboard'))));
         exit;
     }
+    
+    // Order management protected pages
+    $protected_pages = array('services', 'order-details', 'my-orders', 'order');
+    foreach ($protected_pages as $page_slug) {
+        if (is_page($page_slug) && !is_user_logged_in()) {
+            $current_url = home_url($_SERVER['REQUEST_URI']);
+            wp_redirect(site_url('/auth/?redirect_to=' . urlencode($current_url)));
+            exit;
+        }
+    }
 });

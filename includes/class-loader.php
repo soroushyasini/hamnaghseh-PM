@@ -30,6 +30,14 @@ class Hamnaghsheh_Loader
     require_once HAMNAGHSHEH_DIR . 'includes/class-user-setting.php';
     require_once HAMNAGHSHEH_DIR . 'includes/class-pages.php';
     require_once HAMNAGHSHEH_DIR . 'includes/class-minio.php';
+    
+    // Order management system
+    require_once HAMNAGHSHEH_DIR . 'includes/class-services.php';
+    require_once HAMNAGHSHEH_DIR . 'includes/class-orders.php';
+    require_once HAMNAGHSHEH_DIR . 'includes/class-order-messages.php';
+    require_once HAMNAGHSHEH_DIR . 'includes/class-order-activity.php';
+    require_once HAMNAGHSHEH_DIR . 'includes/admin/class-admin-services.php';
+    require_once HAMNAGHSHEH_DIR . 'includes/admin/class-admin-orders.php';
 
     new Hamnaghsheh_Users();
     new Hamnaghsheh_File_Upload();
@@ -40,6 +48,16 @@ class Hamnaghsheh_Loader
     new Hamnaghsheh_User_Settings();
     new Hamnaghsheh_Pages();
     new Hamnaghsheh_Trial_Manager(); // ✅ NEW: Initialize trial system
+    
+    // Initialize order management system
+    new Hamnaghsheh_Services();
+    new Hamnaghsheh_Orders();
+    
+    // Initialize admin classes if in admin
+    if (is_admin()) {
+      new Hamnaghsheh_Admin_Services();
+      new Hamnaghsheh_Admin_Orders();
+    }
 
     add_action('wp_enqueue_scripts', [$this, 'tailwind_assets']);
   }
@@ -54,12 +72,30 @@ class Hamnaghsheh_Loader
     wp_register_style('hamnaghsheh-style', HAMNAGHSHEH_URL . 'assets/css/style.css', array(), HAMNAGHSHEH_VERSION);
     wp_enqueue_style('hamnaghsheh-style');
 
+    // Order management styles
+    if (is_page(array('services', 'order-details', 'my-orders', 'order'))) {
+      wp_register_style('hamnaghsheh-orders', HAMNAGHSHEH_URL . 'assets/css/orders.css', array(), HAMNAGHSHEH_VERSION);
+      wp_enqueue_style('hamnaghsheh-orders');
+
+      wp_register_script('hamnaghsheh-orders', HAMNAGHSHEH_URL . 'assets/js/orders.js', array('jquery'), HAMNAGHSHEH_VERSION, true);
+      wp_enqueue_script('hamnaghsheh-orders');
+    }
   }
 
   public function admin_assets()
   {
     wp_register_style('hamnaghsheh-admin', HAMNAGHSHEH_URL . 'assets/css/dashboard.css', array(), HAMNAGHSHEH_VERSION);
     wp_enqueue_style('hamnaghsheh-admin');
+
+    // Order management admin styles
+    $screen = get_current_screen();
+    if ($screen && (strpos($screen->id, 'hamnaghsheh-orders') !== false || strpos($screen->id, 'hamnaghsheh-services') !== false)) {
+      wp_register_style('hamnaghsheh-admin-orders', HAMNAGHSHEH_URL . 'assets/css/admin-orders.css', array(), HAMNAGHSHEH_VERSION);
+      wp_enqueue_style('hamnaghsheh-admin-orders');
+
+      wp_register_script('hamnaghsheh-admin-orders', HAMNAGHSHEH_URL . 'assets/js/admin-orders.js', array('jquery'), HAMNAGHSHEH_VERSION, true);
+      wp_enqueue_script('hamnaghsheh-admin-orders');
+    }
   }
 
   public function tailwind_assets()
