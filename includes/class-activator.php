@@ -101,7 +101,7 @@ class Hamnaghsheh_Activator
                 file_id BIGINT UNSIGNED NOT NULL,
                 project_id BIGINT UNSIGNED NOT NULL,
                 user_id BIGINT UNSIGNED NOT NULL,
-                action_type ENUM('upload', 'replace', 'delete') NOT NULL,
+                action_type ENUM('upload','replace','delete','download','see') NOT NULL,
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                 PRIMARY KEY (id)
             ) $charset_collate;";
