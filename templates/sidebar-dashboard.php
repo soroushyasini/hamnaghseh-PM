@@ -60,9 +60,13 @@ if (class_exists('Hamnaghsheh_Users')) {
         class="mb-4 block text-white hover:text-[#FFCF00] text-sm truncate transition-colors outline-none">
         پروفایل
     </a>
-    <a href="<?php echo get_site_url() . '/my-account/orders'; ?>"
+    <a href="<?php echo get_site_url() . '/services'; ?>"
         class="mb-4 block text-white hover:text-[#FFCF00] text-sm truncate transition-colors outline-none">
-        خرید ها
+        خرید خدمت
+    </a>
+        <a href="<?php echo get_site_url() . '/my-orders'; ?>"
+        class="mb-4 block text-white hover:text-[#FFCF00] text-sm truncate transition-colors outline-none">
+        سوابق خرید
     </a>
     
     <?php $logout_url = wc_get_account_endpoint_url('customer-logout'); ?>
