@@ -10,6 +10,9 @@ if (!defined('ABSPATH')) {
  */
 class Hamnaghsheh_Profile
 {
+    // Phone number pattern constant
+    const PHONE_USERNAME_PATTERN = '/^u(\d{11})$/';
+    
     public function __construct()
     {
         // Constructor can be used for hooks if needed
@@ -55,29 +58,21 @@ class Hamnaghsheh_Profile
         global $wpdb;
         $users_table = $wpdb->prefix . 'hamnaghsheh_users';
         
-        // First check which columns exist in the table
-        $columns = $wpdb->get_col("DESCRIBE $users_table");
-        $has_trial_fields = in_array('trial_activated', $columns) && in_array('trial_ends_at', $columns);
-        
-        if ($has_trial_fields) {
-            $user_info = $wpdb->get_row($wpdb->prepare(
-                "SELECT access_level, storage_limit, created_at, trial_activated, trial_ends_at 
-                 FROM $users_table 
-                 WHERE user_id = %d 
-                 ORDER BY id DESC 
-                 LIMIT 1",
-                $user_id
-            ), ARRAY_A);
-        } else {
-            $user_info = $wpdb->get_row($wpdb->prepare(
-                "SELECT access_level, storage_limit, created_at 
-                 FROM $users_table 
-                 WHERE user_id = %d 
-                 ORDER BY id DESC 
-                 LIMIT 1",
-                $user_id
-            ), ARRAY_A);
-        }
+        // Try to get user info with trial fields, fall back if they don't exist
+        // Using COALESCE to handle missing columns gracefully
+        $user_info = $wpdb->get_row($wpdb->prepare(
+            "SELECT 
+                access_level, 
+                storage_limit, 
+                created_at,
+                COALESCE(trial_activated, 0) as trial_activated,
+                trial_ends_at
+             FROM $users_table 
+             WHERE user_id = %d 
+             ORDER BY id DESC 
+             LIMIT 1",
+            $user_id
+        ), ARRAY_A);
 
         if (!$user_info) {
             $user_info = [
@@ -88,7 +83,7 @@ class Hamnaghsheh_Profile
                 'trial_ends_at' => null
             ];
         } else {
-            // Ensure trial fields exist even if not in DB
+            // Ensure trial fields exist even if query failed
             if (!isset($user_info['trial_activated'])) {
                 $user_info['trial_activated'] = 0;
             }
@@ -261,8 +256,8 @@ class Hamnaghsheh_Profile
      */
     public static function get_formatted_phone($username)
     {
-        // Check if username starts with 'u' followed by digits
-        if (preg_match('/^u(\d{11})$/', $username, $matches)) {
+        // Check if username matches phone pattern
+        if (preg_match(self::PHONE_USERNAME_PATTERN, $username, $matches)) {
             $phone = $matches[1];
             // Format as XXXX-XXX-XXXX
             return substr($phone, 0, 4) . '-' . substr($phone, 4, 3) . '-' . substr($phone, 7);

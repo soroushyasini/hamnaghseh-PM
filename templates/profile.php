@@ -359,20 +359,27 @@ jQuery(document).ready(function($) {
             if (response.success) {
                 $('#profile-messages').html(
                     '<div class="border-r-4 border-green-400 bg-green-100 p-4 rounded text-sm text-green-700">' +
-                    response.data.message + '</div>'
+                    response.data.message + ' صفحه در حال بارگذاری مجدد...</div>'
                 );
-                // Reload page after 1 second to show updated data
+                // Reload page after 1.5 seconds to refresh sidebar and all user data
+                // This ensures consistency across the UI
                 setTimeout(function() {
                     location.reload();
-                }, 1000);
+                }, 1500);
             } else {
                 $('#profile-messages').html(
                     '<div class="border-r-4 border-red-400 bg-red-100 p-4 rounded text-sm text-red-700">' +
                     response.data.message + '</div>'
                 );
+                $btn.prop('disabled', false).text(originalText);
             }
-        }).always(function() {
+        }).fail(function() {
+            $('#profile-messages').html(
+                '<div class="border-r-4 border-red-400 bg-red-100 p-4 rounded text-sm text-red-700">' +
+                'خطا در ارتباط با سرور. لطفاً دوباره تلاش کنید.</div>'
+            );
             $btn.prop('disabled', false).text(originalText);
+        }).always(function() {
             // Scroll to messages
             $('html, body').animate({
                 scrollTop: $('#profile-messages').offset().top - 100
