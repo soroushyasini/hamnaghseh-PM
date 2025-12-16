@@ -54,14 +54,30 @@ class Hamnaghsheh_Profile
         // Get user access level and storage info
         global $wpdb;
         $users_table = $wpdb->prefix . 'hamnaghsheh_users';
-        $user_info = $wpdb->get_row($wpdb->prepare(
-            "SELECT access_level, storage_limit, created_at, trial_activated, trial_ends_at 
-             FROM $users_table 
-             WHERE user_id = %d 
-             ORDER BY id DESC 
-             LIMIT 1",
-            $user_id
-        ), ARRAY_A);
+        
+        // First check which columns exist in the table
+        $columns = $wpdb->get_col("DESCRIBE $users_table");
+        $has_trial_fields = in_array('trial_activated', $columns) && in_array('trial_ends_at', $columns);
+        
+        if ($has_trial_fields) {
+            $user_info = $wpdb->get_row($wpdb->prepare(
+                "SELECT access_level, storage_limit, created_at, trial_activated, trial_ends_at 
+                 FROM $users_table 
+                 WHERE user_id = %d 
+                 ORDER BY id DESC 
+                 LIMIT 1",
+                $user_id
+            ), ARRAY_A);
+        } else {
+            $user_info = $wpdb->get_row($wpdb->prepare(
+                "SELECT access_level, storage_limit, created_at 
+                 FROM $users_table 
+                 WHERE user_id = %d 
+                 ORDER BY id DESC 
+                 LIMIT 1",
+                $user_id
+            ), ARRAY_A);
+        }
 
         if (!$user_info) {
             $user_info = [
@@ -71,6 +87,14 @@ class Hamnaghsheh_Profile
                 'trial_activated' => 0,
                 'trial_ends_at' => null
             ];
+        } else {
+            // Ensure trial fields exist even if not in DB
+            if (!isset($user_info['trial_activated'])) {
+                $user_info['trial_activated'] = 0;
+            }
+            if (!isset($user_info['trial_ends_at'])) {
+                $user_info['trial_ends_at'] = null;
+            }
         }
 
         $access_level = $user_info['access_level'];
