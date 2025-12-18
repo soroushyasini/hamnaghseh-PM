@@ -65,8 +65,8 @@ class Hamnaghsheh_Activator
                 display_name VARCHAR(255) DEFAULT NULL,
                 email VARCHAR(255) DEFAULT NULL,
                 active TINYINT(1) DEFAULT 1,
-                storage_limit  BIGINT UNSIGNED DEFAULT 52428800,
-                access_level ENUM('free', 'premium') DEFAULT 'free',
+                storage_limit  BIGINT UNSIGNED DEFAULT 0,
+                access_level ENUM('free', 'premium','enterprise') DEFAULT 'free',
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                 PRIMARY KEY (id)
             ) {$charset_collate};";
@@ -194,7 +194,7 @@ class Hamnaghsheh_Activator
                 $wpdb->insert($services_table, array(
                     'service_key' => 'half_day',
                     'service_name_fa' => 'نقشه برداری نیم روزه',
-                    'price_per_session' => 750000,
+                    'price_per_session' => 3000000,
                     'description' => 'خدمات نقشه برداری نیم روزه برای پروژه‌های کوچک تا متوسط',
                     'image_url' => HAMNAGHSHEH_URL . 'assets/img/placeholder-service.jpg',
                     'is_active' => 1
@@ -202,7 +202,7 @@ class Hamnaghsheh_Activator
                 $wpdb->insert($services_table, array(
                     'service_key' => 'full_day',
                     'service_name_fa' => 'نقشه برداری تمام روزه',
-                    'price_per_session' => 2000000,
+                    'price_per_session' => 5000000,
                     'description' => 'خدمات نقشه برداری تمام روزه برای پروژه‌های بزرگ و پیچیده',
                     'image_url' => HAMNAGHSHEH_URL . 'assets/img/placeholder-service.jpg',
                     'is_active' => 1
