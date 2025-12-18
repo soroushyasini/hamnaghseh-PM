@@ -7,9 +7,9 @@ class Hamnaghsheh_Admin_Orders
     public function __construct()
     {
         add_action('admin_menu', array($this, 'add_admin_menu'));
-        add_action('wp_ajax_hamnaghsheh_admin_set_quote', array($this, 'ajax_set_quote'));
+        // SIMPLIFIED VERSION: Remove quote and messaging, add simple price setter
+        add_action('wp_ajax_hamnaghsheh_admin_set_price', array($this, 'ajax_set_price'));
         add_action('wp_ajax_hamnaghsheh_admin_update_status', array($this, 'ajax_update_status'));
-        add_action('wp_ajax_hamnaghsheh_admin_send_message', array($this, 'ajax_send_message'));
         add_action('wp_ajax_hamnaghsheh_admin_create_project', array($this, 'ajax_create_project'));
     }
 
@@ -94,6 +94,7 @@ class Hamnaghsheh_Admin_Orders
 
     /**
      * Render order detail page
+     * SIMPLIFIED VERSION: No messaging
      */
     public function render_order_detail()
     {
@@ -107,20 +108,18 @@ class Hamnaghsheh_Admin_Orders
 
         $user = get_userdata($order->user_id);
         $service = Hamnaghsheh_Services::get_service_by_key($order->service_type);
-        $messages = Hamnaghsheh_Order_Messages::get_order_messages($order_id);
+        // REMOVED: messages - no longer needed in simplified version
         $activity = Hamnaghsheh_Order_Activity::get_order_activity($order_id);
         $services = Hamnaghsheh_Services::get_active_services();
-
-        // Mark admin messages as read
-        Hamnaghsheh_Order_Messages::mark_as_read($order_id, true);
 
         include HAMNAGHSHEH_DIR . 'templates/admin/order-detail.php';
     }
 
     /**
-     * AJAX: Set quote
+     * AJAX: Set final price (SIMPLIFIED VERSION)
+     * After phone discussion, admin sets final price and status
      */
-    public function ajax_set_quote()
+    public function ajax_set_price()
     {
         check_ajax_referer('hamnaghsheh_ajax_nonce', 'nonce');
 
@@ -138,14 +137,18 @@ class Hamnaghsheh_Admin_Orders
         global $wpdb;
         $table = $wpdb->prefix . 'hamnaghsheh_orders';
 
+        $final_price = isset($_POST['final_price']) ? floatval($_POST['final_price']) : null;
+        $status = isset($_POST['status']) ? sanitize_text_field($_POST['status']) : $order->status;
+        $admin_notes = isset($_POST['admin_notes']) ? sanitize_textarea_field($_POST['admin_notes']) : '';
+
         $update_data = array(
-            'admin_estimated_service_type' => sanitize_text_field($_POST['service_type']),
-            'admin_estimated_quantity' => intval($_POST['quantity']),
-            'admin_estimated_price_per_session' => floatval($_POST['price_per_session']),
-            'admin_estimated_total_price' => floatval($_POST['total_price']),
-            'admin_notes' => sanitize_textarea_field($_POST['admin_notes']),
-            'status' => 'quoted'
+            'admin_notes' => $admin_notes,
+            'status' => $status
         );
+
+        if ($final_price !== null && $final_price > 0) {
+            $update_data['final_price'] = $final_price;
+        }
 
         $result = $wpdb->update($table, $update_data, array('id' => $order_id));
 
@@ -155,23 +158,25 @@ class Hamnaghsheh_Admin_Orders
                 $order_id,
                 'price_set',
                 '',
-                '',
-                'برآورد جدید ارسال شد',
+                $final_price,
+                'قیمت نهایی تنظیم شد',
                 get_current_user_id(),
                 true
             );
 
-            // Send notification
-            do_action('hamnaghsheh_quote_received', $order_id);
+            // Send notification if price was set and status is awaiting_payment
+            if ($status == 'awaiting_payment' && $final_price > 0) {
+                do_action('hamnaghsheh_price_set', $order_id);
+            }
 
-            wp_send_json_success(array('message' => 'برآورد با موفقیت ارسال شد.'));
+            wp_send_json_success(array('message' => 'تغییرات با موفقیت ذخیره شد.'));
         } else {
-            wp_send_json_error(array('message' => 'خطا در ارسال برآورد.'));
+            wp_send_json_error(array('message' => 'خطا در ذخیره تغییرات.'));
         }
     }
 
     /**
-     * AJAX: Update status
+     * AJAX: Update status (SIMPLIFIED VERSION)
      */
     public function ajax_update_status()
     {
@@ -200,32 +205,7 @@ class Hamnaghsheh_Admin_Orders
         }
     }
 
-    /**
-     * AJAX: Send message
-     */
-    public function ajax_send_message()
-    {
-        check_ajax_referer('hamnaghsheh_ajax_nonce', 'nonce');
-
-        if (!current_user_can('manage_options')) {
-            wp_send_json_error(array('message' => 'دسترسی غیرمجاز.'));
-        }
-
-        $order_id = intval($_POST['order_id']);
-        $message = sanitize_textarea_field($_POST['message']);
-
-        if (empty($message)) {
-            wp_send_json_error(array('message' => 'پیام نمی‌تواند خالی باشد.'));
-        }
-
-        $result = Hamnaghsheh_Order_Messages::add_message($order_id, $message, true);
-
-        if ($result) {
-            wp_send_json_success(array('message' => 'پیام ارسال شد.'));
-        } else {
-            wp_send_json_error(array('message' => 'خطا در ارسال پیام.'));
-        }
-    }
+    // REMOVED: ajax_send_message - No messaging in simplified version
 
     /**
      * AJAX: Create project for order

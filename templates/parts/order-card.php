@@ -18,11 +18,7 @@ $status_label = Hamnaghsheh_Orders::get_status_label($order->status);
                         <span class="<?php echo esc_attr($status_badge_class); ?> px-3 py-1 rounded-full text-xs font-semibold">
                             <?php echo esc_html($status_label); ?>
                         </span>
-                        <?php if ($unread_count > 0) : ?>
-                            <span class="bg-red-500 text-white px-2 py-1 rounded-full text-xs font-semibold">
-                                <?php echo $unread_count; ?> پیام جدید
-                            </span>
-                        <?php endif; ?>
+                        <?php /* REMOVED: unread message count badge - no messaging in simplified version */ ?>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-gray-600 mb-3">
@@ -42,18 +38,15 @@ $status_label = Hamnaghsheh_Orders::get_status_label($order->status);
                             <span class="font-semibold">مبلغ:</span>
                             <span class="text-green-600 font-bold">
                                 <?php 
-                                $final_price = $order->admin_estimated_total_price ? $order->admin_estimated_total_price : $order->requested_total_price;
+                                // SIMPLIFIED VERSION: Use final_price if set, otherwise requested price
+                                $final_price = $order->final_price ? $order->final_price : $order->requested_total_price;
                                 echo number_format($final_price, 0, '.', ','); 
                                 ?> تومان
                             </span>
                         </div>
                     </div>
 
-                    <?php if ($order->admin_estimated_total_price && $order->admin_estimated_total_price != $order->requested_total_price) : ?>
-                        <div class="bg-orange-50 border-r-4 border-orange-400 p-2 text-sm text-orange-800 mb-2">
-                            مبلغ برآورد شده توسط کارشناس متفاوت است. لطفاً جزئیات را بررسی کنید.
-                        </div>
-                    <?php endif; ?>
+                    <?php /* REMOVED: Admin estimation notice - simplified version */ ?>
                 </div>
             </div>
         </div>

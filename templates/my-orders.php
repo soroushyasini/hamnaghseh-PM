@@ -52,7 +52,7 @@ function time_ago_persian($datetime) {
             <div class="space-y-4">
                 <?php foreach ($orders as $order) : 
                     $service = Hamnaghsheh_Services::get_service_by_key($order->service_type);
-                    $unread_count = Hamnaghsheh_Orders::get_unread_count($order->id);
+                    // REMOVED: unread_count - no messaging in simplified version
                 ?>
                     <?php include HAMNAGHSHEH_DIR . 'templates/parts/order-card.php'; ?>
                 <?php endforeach; ?>

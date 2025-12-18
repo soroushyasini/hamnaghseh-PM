@@ -8,6 +8,11 @@ if (!defined('ABSPATH'))
         <div class="mb-8">
             <h1 class="font-black text-2xl xl:text-3xl mb-3 text-[#09375B]">جزئیات سفارش</h1>
             <p class="text-gray-600">لطفاً اطلاعات سفارش خود را تکمیل کنید.</p>
+            <div class="bg-yellow-50 border-r-4 border-yellow-400 p-4 mt-4">
+                <p class="text-sm text-yellow-800">
+                    <strong>توجه:</strong> کارشناس ما پس از بررسی سفارش با شما تماس خواهد گرفت تا قیمت نهایی را تعیین کند.
+                </p>
+            </div>
         </div>
 
         <form id="order-form" class="bg-white rounded-lg shadow-md p-6">

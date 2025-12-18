@@ -10,13 +10,9 @@ class Hamnaghsheh_Orders
         add_shortcode('hamnaghsheh_my_orders', array($this, 'render_my_orders'));
         add_shortcode('hamnaghsheh_order_detail', array($this, 'render_order_detail'));
 
-        // AJAX endpoints
+        // AJAX endpoints - SIMPLIFIED VERSION
         add_action('wp_ajax_hamnaghsheh_submit_order', array($this, 'ajax_submit_order'));
-        add_action('wp_ajax_hamnaghsheh_accept_quote', array($this, 'ajax_accept_quote'));
-        add_action('wp_ajax_hamnaghsheh_send_order_message', array($this, 'ajax_send_message'));
-        add_action('wp_ajax_hamnaghsheh_edit_order', array($this, 'ajax_edit_order'));
-        add_action('wp_ajax_hamnaghsheh_cancel_order', array($this, 'ajax_cancel_order'));
-        add_action('wp_ajax_hamnaghsheh_mark_messages_read', array($this, 'ajax_mark_messages_read'));
+        // REMOVED: quote acceptance, messaging, order editing - no longer needed in simplified version
     }
 
     /**
@@ -54,6 +50,7 @@ class Hamnaghsheh_Orders
 
     /**
      * Render order detail shortcode
+     * SIMPLIFIED VERSION: No messaging, just order details and activity
      */
     public function render_order_detail()
     {
@@ -68,7 +65,7 @@ class Hamnaghsheh_Orders
             return '<p>سفارش یافت نشد.</p>';
         }
 
-        $messages = Hamnaghsheh_Order_Messages::get_order_messages($order_id);
+        // REMOVED: messages - no longer needed in simplified version
         $activity = Hamnaghsheh_Order_Activity::get_order_activity($order_id);
         $service = Hamnaghsheh_Services::get_service_by_key($order->service_type);
 
@@ -215,23 +212,6 @@ class Hamnaghsheh_Orders
     }
 
     /**
-     * Get unread messages count for order
-     */
-    public static function get_unread_count($order_id, $for_admin = false)
-    {
-        global $wpdb;
-        $table = $wpdb->prefix . 'hamnaghsheh_order_messages';
-
-        $is_admin = $for_admin ? 1 : 0;
-
-        return $wpdb->get_var($wpdb->prepare(
-            "SELECT COUNT(*) FROM {$table} WHERE order_id = %d AND is_read = 0 AND is_admin != %d",
-            $order_id,
-            $is_admin
-        ));
-    }
-
-    /**
      * AJAX: Submit order
      */
     public function ajax_submit_order()
@@ -262,174 +242,22 @@ class Hamnaghsheh_Orders
         }
     }
 
-    /**
-     * AJAX: Accept quote
-     */
-    public function ajax_accept_quote()
-    {
-        check_ajax_referer('hamnaghsheh_ajax_nonce', 'nonce');
-
-        if (!is_user_logged_in()) {
-            wp_send_json_error(array('message' => 'لطفاً وارد شوید.'));
-        }
-
-        $order_id = intval($_POST['order_id']);
-        $order = self::get_order_by_id($order_id);
-
-        if (!$order || $order->user_id != get_current_user_id()) {
-            wp_send_json_error(array('message' => 'سفارش یافت نشد.'));
-        }
-
-        if ($order->status != 'quoted') {
-            wp_send_json_error(array('message' => 'این سفارش قابل تایید نیست.'));
-        }
-
-        $result = self::update_status($order_id, 'user_accepted');
-
-        if ($result) {
-            do_action('hamnaghsheh_quote_accepted', $order_id);
-            wp_send_json_success(array('message' => 'برآورد تایید شد.'));
-        } else {
-            wp_send_json_error(array('message' => 'خطا در تایید برآورد.'));
-        }
-    }
-
-    /**
-     * AJAX: Send message
-     */
-    public function ajax_send_message()
-    {
-        check_ajax_referer('hamnaghsheh_ajax_nonce', 'nonce');
-
-        if (!is_user_logged_in()) {
-            wp_send_json_error(array('message' => 'لطفاً وارد شوید.'));
-        }
-
-        $order_id = intval($_POST['order_id']);
-        $message = sanitize_textarea_field($_POST['message']);
-
-        if (empty($message)) {
-            wp_send_json_error(array('message' => 'پیام نمی‌تواند خالی باشد.'));
-        }
-
-        $order = self::get_order_by_id($order_id);
-        if (!$order || $order->user_id != get_current_user_id()) {
-            wp_send_json_error(array('message' => 'سفارش یافت نشد.'));
-        }
-
-        $result = Hamnaghsheh_Order_Messages::add_message($order_id, $message, false);
-
-        if ($result) {
-            wp_send_json_success(array('message' => 'پیام ارسال شد.'));
-        } else {
-            wp_send_json_error(array('message' => 'خطا در ارسال پیام.'));
-        }
-    }
-
-    /**
-     * AJAX: Edit order
-     */
-    public function ajax_edit_order()
-    {
-        check_ajax_referer('hamnaghsheh_ajax_nonce', 'nonce');
-
-        if (!is_user_logged_in()) {
-            wp_send_json_error(array('message' => 'لطفاً وارد شوید.'));
-        }
-
-        $order_id = intval($_POST['order_id']);
-        $order = self::get_order_by_id($order_id);
-
-        if (!$order || $order->user_id != get_current_user_id()) {
-            wp_send_json_error(array('message' => 'سفارش یافت نشد.'));
-        }
-
-        if ($order->status != 'pending') {
-            wp_send_json_error(array('message' => 'فقط سفارش‌های در انتظار قابل ویرایش هستند.'));
-        }
-
-        global $wpdb;
-        $table = $wpdb->prefix . 'hamnaghsheh_orders';
-
-        $update_data = array(
-            'address' => sanitize_textarea_field($_POST['address']),
-            'area_size' => sanitize_text_field($_POST['area_size']),
-            'phone' => sanitize_text_field($_POST['phone']),
-            'special_requirements' => sanitize_textarea_field($_POST['special_requirements'])
-        );
-
-        $result = $wpdb->update($table, $update_data, array('id' => $order_id));
-
-        if ($result !== false) {
-            Hamnaghsheh_Order_Activity::log_activity($order_id, 'order_edited', '', '', 'سفارش ویرایش شد');
-            wp_send_json_success(array('message' => 'سفارش بروزرسانی شد.'));
-        } else {
-            wp_send_json_error(array('message' => 'خطا در بروزرسانی سفارش.'));
-        }
-    }
-
-    /**
-     * AJAX: Cancel order
-     */
-    public function ajax_cancel_order()
-    {
-        check_ajax_referer('hamnaghsheh_ajax_nonce', 'nonce');
-
-        if (!is_user_logged_in()) {
-            wp_send_json_error(array('message' => 'لطفاً وارد شوید.'));
-        }
-
-        $order_id = intval($_POST['order_id']);
-        $order = self::get_order_by_id($order_id);
-
-        if (!$order || $order->user_id != get_current_user_id()) {
-            wp_send_json_error(array('message' => 'سفارش یافت نشد.'));
-        }
-
-        $result = self::update_status($order_id, 'cancelled');
-
-        if ($result) {
-            wp_send_json_success(array('message' => 'سفارش لغو شد.'));
-        } else {
-            wp_send_json_error(array('message' => 'خطا در لغو سفارش.'));
-        }
-    }
-
-    /**
-     * AJAX: Mark messages as read
-     */
-    public function ajax_mark_messages_read()
-    {
-        check_ajax_referer('hamnaghsheh_ajax_nonce', 'nonce');
-
-        if (!is_user_logged_in()) {
-            wp_send_json_error(array('message' => 'لطفاً وارد شوید.'));
-        }
-
-        $order_id = intval($_POST['order_id']);
-        $order = self::get_order_by_id($order_id);
-
-        if (!$order || $order->user_id != get_current_user_id()) {
-            wp_send_json_error(array('message' => 'سفارش یافت نشد.'));
-        }
-
-        Hamnaghsheh_Order_Messages::mark_as_read($order_id, false);
-        wp_send_json_success();
-    }
+    // REMOVED: ajax_accept_quote - No longer needed in simplified version
+    // REMOVED: ajax_send_message - No messaging in simplified version
+    // REMOVED: ajax_edit_order - No order editing in simplified version
+    // REMOVED: ajax_cancel_order - Removed for users, admin can cancel
+    // REMOVED: ajax_mark_messages_read - No messaging in simplified version
 
     /**
      * Get status label in Persian
+     * SIMPLIFIED VERSION: Only 6 statuses
      */
     public static function get_status_label($status)
     {
         $labels = array(
             'pending' => 'در انتظار بررسی',
-            'reviewed' => 'در حال کارشناسی',
-            'quoted' => 'برآورد ارسال شده',
-            'user_accepted' => 'تایید شده',
-            'awaiting_payment' => 'در انتظار پرداخت',
-            'payment_uploaded' => 'رسید بارگذاری شده',
-            'paid' => 'پرداخت تایید شده',
+            'awaiting_payment' => 'آماده پرداخت',
+            'paid' => 'پرداخت شده',
             'in_progress' => 'در حال انجام',
             'completed' => 'تکمیل شده',
             'cancelled' => 'لغو شده'
@@ -440,22 +268,19 @@ class Hamnaghsheh_Orders
 
     /**
      * Get status badge class
+     * SIMPLIFIED VERSION: Only 6 statuses with updated colors
      */
     public static function get_status_badge_class($status)
     {
         $classes = array(
-            'pending' => 'bg-gray-100 text-gray-800',
-            'reviewed' => 'bg-blue-100 text-blue-800',
-            'quoted' => 'bg-orange-100 text-orange-800',
-            'user_accepted' => 'bg-green-100 text-green-700',
-            'awaiting_payment' => 'bg-yellow-100 text-yellow-800',
-            'payment_uploaded' => 'bg-purple-100 text-purple-800',
-            'paid' => 'bg-green-100 text-green-800',
-            'in_progress' => 'bg-blue-200 text-blue-900',
-            'completed' => 'bg-green-200 text-green-900',
-            'cancelled' => 'bg-red-100 text-red-800'
+            'pending' => 'bg-gray-500 text-white',
+            'awaiting_payment' => 'bg-yellow-500 text-white',
+            'paid' => 'bg-green-600 text-white',
+            'in_progress' => 'bg-blue-600 text-white',
+            'completed' => 'bg-green-800 text-white',
+            'cancelled' => 'bg-red-600 text-white'
         );
 
-        return isset($classes[$status]) ? $classes[$status] : 'bg-gray-100 text-gray-800';
+        return isset($classes[$status]) ? $classes[$status] : 'bg-gray-500 text-white';
     }
 }
