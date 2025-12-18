@@ -33,7 +33,7 @@ class Hamnaghsheh_Activator
                 user_id BIGINT UNSIGNED NOT NULL,
                 name VARCHAR(255) NOT NULL,
                 description TEXT,
-                type ENUM('residential','commercial','renovation','infrastructure') DEFAULT 'residential',
+                type ENUM('residential','commercial','renovation','infrastructure','other') DEFAULT 'residential',
                 status ENUM('active','completed','archived') DEFAULT 'active',
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                 updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
