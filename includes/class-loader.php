@@ -21,7 +21,7 @@ class Hamnaghsheh_Loader
     require_once HAMNAGHSHEH_DIR . 'includes/class-projects.php';
     require_once HAMNAGHSHEH_DIR . 'includes/class-utils.php';
     require_once HAMNAGHSHEH_DIR . 'includes/class-file-validator.php';
-    require_once HAMNAGHSHEH_DIR . 'includes/class-trial-manager.php'; // ✅ NEW: Trial system
+    require_once HAMNAGHSHEH_DIR . 'includes/class-trial-manager.php';
     require_once HAMNAGHSHEH_DIR . 'includes/class-upload-file.php';
     require_once HAMNAGHSHEH_DIR . 'includes/class-shares.php';
     require_once HAMNAGHSHEH_DIR . 'includes/class-auth.php';
@@ -31,11 +31,11 @@ class Hamnaghsheh_Loader
     require_once HAMNAGHSHEH_DIR . 'includes/class-pages.php';
     require_once HAMNAGHSHEH_DIR . 'includes/class-minio.php';
     
-    // Order management system
+    // Order management system (simplified version)
     require_once HAMNAGHSHEH_DIR . 'includes/class-services.php';
     require_once HAMNAGHSHEH_DIR . 'includes/class-orders.php';
-    require_once HAMNAGHSHEH_DIR . 'includes/class-order-messages.php';
     require_once HAMNAGHSHEH_DIR . 'includes/class-order-activity.php';
+    // REMOVED in simplified version:  class-order-messages.php
     require_once HAMNAGHSHEH_DIR . 'includes/admin/class-admin-services.php';
     require_once HAMNAGHSHEH_DIR . 'includes/admin/class-admin-orders.php';
 
@@ -47,7 +47,7 @@ class Hamnaghsheh_Loader
     new Hamnaghsheh_File_Download();
     new Hamnaghsheh_User_Settings();
     new Hamnaghsheh_Pages();
-    new Hamnaghsheh_Trial_Manager(); // ✅ NEW: Initialize trial system
+    new Hamnaghsheh_Trial_Manager();
     
     // Initialize order management system
     new Hamnaghsheh_Services();
@@ -100,7 +100,6 @@ class Hamnaghsheh_Loader
 
   public function tailwind_assets()
   {
-    // ✅ بارگذاری Tailwind از CDN (بدون build)
     wp_enqueue_script(
       'tailwindcdn',
       'https://cdn.tailwindcss.com',
@@ -109,7 +108,6 @@ class Hamnaghsheh_Loader
       false
     );
 
-    // ✅ پیکربندی اولیه Tailwind (فونت + رنگ‌ها)
     $custom_tailwind = "
             tailwind.config = {
               theme: {
