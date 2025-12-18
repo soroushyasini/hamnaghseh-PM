@@ -37,7 +37,7 @@ class Hamnaghsheh_Utils
     {
         $labels = [
             'free' => 'رایگان',
-            'premium' => 'پرمیوم',
+            'premium' => 'شخصی',
             'enterprise' => 'سازمانی'
         ];
         return $labels[$access_level] ?? 'نامشخص';
