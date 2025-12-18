@@ -91,19 +91,8 @@
         });
     }
 
-    // Auto-scroll messages to bottom
-    if ($('.messages-container').length) {
-        const messagesContainer = $('.messages-container');
-        messagesContainer.scrollTop(messagesContainer[0].scrollHeight);
-    }
-
-    // Confirm before canceling order
-    $(document).on('click', '#cancel-order-btn', function(e) {
-        if (!confirm('آیا از لغو این سفارش اطمینان دارید؟ این عملیات قابل بازگشت نیست.')) {
-            e.preventDefault();
-            return false;
-        }
-    });
+    // REMOVED: Auto-scroll messages - no messaging in simplified version
+    // REMOVED: User cancel order - admin only in simplified version
 
     // Real-time character counter for textareas
     $('textarea[maxlength]').each(function() {
