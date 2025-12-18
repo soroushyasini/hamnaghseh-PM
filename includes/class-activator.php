@@ -21,7 +21,7 @@ class Hamnaghsheh_Activator
         $order_messages_table = $wpdb->prefix . 'hamnaghsheh_order_messages';
         $order_activity_table = $wpdb->prefix . 'hamnaghsheh_order_activity';
 
-        $current_db_version = '3.0';
+        $current_db_version = '3.1'; // Updated for simplified order system
         $installed_db_version = get_option('hamnaghsheh_db_version');
 
         if ($installed_db_version !== $current_db_version) {
@@ -140,6 +140,7 @@ class Hamnaghsheh_Activator
                 admin_estimated_quantity INT(11),
                 admin_estimated_price_per_session DECIMAL(10,2),
                 admin_estimated_total_price DECIMAL(10,2),
+                final_price DECIMAL(10,2) DEFAULT NULL COMMENT 'Final price set by admin after phone discussion',
                 admin_notes TEXT,
                 address TEXT NOT NULL,
                 area_size VARCHAR(100) NOT NULL,
@@ -211,7 +212,39 @@ class Hamnaghsheh_Activator
 
             wp_mkdir_p(HAMNAGHSHEH_UPLOAD_DIR);
 
+            // Migrate old order statuses to new simplified system (only run once)
+            if ($installed_db_version && version_compare($installed_db_version, '3.1', '<')) {
+                self::migrate_order_statuses();
+            }
+
             update_option('hamnaghsheh_db_version', $current_db_version);
+        }
+    }
+
+    /**
+     * Migrate old order statuses to new simplified system
+     * SIMPLIFIED VERSION: Maps complex statuses to 6 simple ones
+     */
+    private static function migrate_order_statuses()
+    {
+        global $wpdb;
+        $table = $wpdb->prefix . 'hamnaghsheh_orders';
+
+        // Map old statuses to new ones
+        $status_migration_map = array(
+            'reviewed' => 'pending',
+            'quoted' => 'awaiting_payment',
+            'user_accepted' => 'awaiting_payment',
+            'payment_uploaded' => 'paid',
+            // Keep others as is: pending, awaiting_payment, paid, in_progress, completed, cancelled
+        );
+
+        foreach ($status_migration_map as $old_status => $new_status) {
+            $wpdb->update(
+                $table,
+                array('status' => $new_status),
+                array('status' => $old_status)
+            );
         }
     }
 }
