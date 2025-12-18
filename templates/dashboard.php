@@ -25,7 +25,7 @@ $is_admin = current_user_can('manage_options');
         </div>
         <div class="flex items-center justify-center gap-2">
             
-          <a href="<?php echo esc_url(site_url('/shop')); ?>"
+          <a href="<?php echo esc_url(site_url('/services')); ?>"
             class="border bg-transparent text-slate-900 px-4 py-2 rounded text-sm">
             خدمات نقشه برداری
           </a>
