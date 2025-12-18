@@ -47,41 +47,7 @@
         showNotification('خطا در ارتباط با سرور. لطفاً دوباره تلاش کنید.', 'error');
     }
 
-    // Real-time price calculation in admin quote form
-    if ($('#quote-form').length) {
-        function calculateQuotePrice() {
-            const selectedService = $('input[name="service_type"]:checked');
-            const quantity = parseInt($('#estimated-quantity').val()) || 1;
-            const standardPrice = parseFloat(selectedService.data('price')) || 0;
-            const priceType = $('input[name="price_type"]:checked').val();
-            let pricePerSession = standardPrice;
-
-            if (priceType === 'custom') {
-                pricePerSession = parseFloat($('#custom-price').val()) || 0;
-            }
-
-            const total = quantity * pricePerSession;
-
-            $('#standard-price').text(formatNumber(standardPrice));
-            $('#total-price').text(formatNumber(total) + ' تومان');
-            $('#final-price-per-session').val(pricePerSession);
-            $('#total-price-value').val(total);
-        }
-
-        $('input[name="service_type"], #estimated-quantity, input[name="price_type"], #custom-price')
-            .on('change input', calculateQuotePrice);
-
-        $('input[name="price_type"]').on('change', function() {
-            $('#custom-price').prop('disabled', $(this).val() !== 'custom');
-            if ($(this).val() === 'custom') {
-                $('#custom-price').focus();
-            }
-            calculateQuotePrice();
-        });
-
-        // Initialize
-        calculateQuotePrice();
-    }
+    // REMOVED: Real-time price calculation in admin quote form - simplified version uses simple price input
 
     // Bulk actions for orders list
     if ($('.wp-list-table').length) {
@@ -108,37 +74,7 @@
         });
     }
 
-    // Auto-refresh unread message count
-    function updateUnreadCounts() {
-        $('.unread-badge').each(function() {
-            const badge = $(this);
-            const orderId = badge.data('order-id');
-            
-            if (orderId) {
-                $.ajax({
-                    url: ajaxurl,
-                    type: 'POST',
-                    data: {
-                        action: 'hamnaghsheh_get_unread_count',
-                        order_id: orderId,
-                        for_admin: 1
-                    },
-                    success: function(response) {
-                        if (response.success && response.data.count > 0) {
-                            badge.text(response.data.count).show();
-                        } else {
-                            badge.hide();
-                        }
-                    }
-                });
-            }
-        });
-    }
-
-    // Refresh unread counts every 30 seconds
-    if ($('.unread-badge').length) {
-        setInterval(updateUnreadCounts, 30000);
-    }
+    // REMOVED: Auto-refresh unread message count - no messaging in simplified version
 
     // Quick status change from orders list
     $(document).on('click', '.quick-status-change', function(e) {
@@ -191,11 +127,7 @@
         window.location.href = ajaxurl + '?action=hamnaghsheh_export_orders&' + queryString;
     });
 
-    // Scroll to latest message in admin thread
-    if ($('.admin-message-thread').length) {
-        const messageThread = $('.admin-message-thread');
-        messageThread.scrollTop(messageThread[0].scrollHeight);
-    }
+    // REMOVED: Scroll to latest message - no messaging in simplified version
 
     // Highlight changed fields
     $('.admin-order-detail-grid input, .admin-order-detail-grid textarea, .admin-order-detail-grid select')
@@ -263,7 +195,8 @@
 
     // Clear draft after successful submission
     $(document).on('ajaxSuccess', function(event, xhr, settings) {
-        if (settings.data && settings.data.indexOf('hamnaghsheh_admin_set_quote') > -1) {
+        // REMOVED: hamnaghsheh_admin_set_quote - now uses hamnaghsheh_admin_set_price
+        if (settings.data && settings.data.indexOf('hamnaghsheh_admin_set_price') > -1) {
             const orderId = $('input[name="order_id"]').val();
             localStorage.removeItem('admin_notes_draft_' + orderId);
         }

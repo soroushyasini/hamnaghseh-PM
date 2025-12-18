@@ -42,7 +42,7 @@
     transform: translateY(-2px);
 }
 
-/* Status Badges */
+/* Status Badges - SIMPLIFIED VERSION: 6 statuses */
 .status-badge {
     display: inline-block;
     padding: 4px 12px;
@@ -52,28 +52,38 @@
     white-space: nowrap;
 }
 
-/* Messages */
-.messages-container {
-    scroll-behavior: smooth;
+/* Status badge colors matching PHP */
+.status-pending {
+    background-color: #6c757d;
+    color: white;
 }
 
-.messages-container::-webkit-scrollbar {
-    width: 8px;
+.status-awaiting-payment {
+    background-color: #ffc107;
+    color: white;
 }
 
-.messages-container::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 4px;
+.status-paid {
+    background-color: #198754;
+    color: white;
 }
 
-.messages-container::-webkit-scrollbar-thumb {
-    background: #888;
-    border-radius: 4px;
+.status-in-progress {
+    background-color: #0d6efd;
+    color: white;
 }
 
-.messages-container::-webkit-scrollbar-thumb:hover {
-    background: #555;
+.status-completed {
+    background-color: #146c43;
+    color: white;
 }
+
+.status-cancelled {
+    background-color: #dc3545;
+    color: white;
+}
+
+/* REMOVED: Messages styles - no messaging in simplified version */
 
 /* Loading States */
 .loading {
@@ -99,26 +109,11 @@
     font-family: 'Vazirmatn', 'Vazir', sans-serif;
 }
 
-/* Animation for new messages */
-@keyframes slideIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.message-new {
-    animation: slideIn 0.3s ease;
-}
+/* REMOVED: Animation for new messages - no messaging in simplified version */
 
 /* Print Styles */
 @media print {
     .order-actions,
-    .message-form,
     button {
         display: none;
     }
