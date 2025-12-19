@@ -7,6 +7,8 @@ class Hamnaghsheh_Activator
 
     public static function activate()
     {
+        self::add_custom_capabilities();
+        
         global $wpdb;
         $charset_collate = $wpdb->get_charset_collate();
 
@@ -245,6 +247,27 @@ class Hamnaghsheh_Activator
                 array('status' => $new_status),
                 array('status' => $old_status)
             );
+        }
+    }
+    
+    /**
+     * Add custom capabilities to roles
+     * Grants capabilities to administrator role for flexible access control
+     */
+    private static function add_custom_capabilities()
+    {
+        $admin_role = get_role('administrator');
+        
+        if ($admin_role) {
+            // Project capabilities
+            $admin_role->add_cap('view_all_projects');
+            $admin_role->add_cap('manage_projects');
+            $admin_role->add_cap('upload_to_any_project');
+            
+            // Order capabilities
+            $admin_role->add_cap('view_all_orders');
+            $admin_role->add_cap('manage_orders');
+            $admin_role->add_cap('set_order_prices');
         }
     }
 }
