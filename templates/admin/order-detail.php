@@ -183,7 +183,7 @@ $status_label = Hamnaghsheh_Orders::get_status_label($order->status);
                 </div>
                 <div class="inside">
                     <p>پروژه ایجاد شده است.</p>
-                    <a href="<?php echo site_url('/project-show/?id=' . $order->project_id); ?>" class="button" target="_blank">
+                    <a href="<?php echo site_url('/show-project/?id=' . $order->project_id); ?>" class="button" target="_blank">
                         مشاهده پروژه
                     </a>
                 </div>
