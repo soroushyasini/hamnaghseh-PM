@@ -22,28 +22,28 @@ class Hamnaghsheh_Project_Show
         global $wpdb;
         
         // Check if user is the project owner
-        $project = $wpdb->get_row($wpdb->prepare(
-            "SELECT * FROM {$wpdb->prefix}hamnaghsheh_projects WHERE id = %d",
+        $owner_id = $wpdb->get_var($wpdb->prepare(
+            "SELECT user_id FROM {$wpdb->prefix}hamnaghsheh_projects WHERE id = %d",
             $project_id
         ));
         
-        if (!$project) {
+        if (!$owner_id) {
             return false; // Project doesn't exist
         }
         
-        if ($project->user_id == $user_id) {
+        if ($owner_id == $user_id) {
             return true; // Owner has access
         }
         
         // Check if user is assigned to the project
-        $assignment = $wpdb->get_row($wpdb->prepare(
-            "SELECT * FROM {$wpdb->prefix}hamnaghsheh_project_assignments 
+        $is_assigned = $wpdb->get_var($wpdb->prepare(
+            "SELECT COUNT(*) FROM {$wpdb->prefix}hamnaghsheh_project_assignments 
              WHERE project_id = %d AND user_id = %d",
             $project_id,
             $user_id
         ));
         
-        return !empty($assignment);
+        return $is_assigned > 0;
     }
     
     /**
@@ -63,24 +63,24 @@ class Hamnaghsheh_Project_Show
         global $wpdb;
         
         // Check if owner
-        $project = $wpdb->get_row($wpdb->prepare(
-            "SELECT * FROM {$wpdb->prefix}hamnaghsheh_projects WHERE id = %d",
+        $owner_id = $wpdb->get_var($wpdb->prepare(
+            "SELECT user_id FROM {$wpdb->prefix}hamnaghsheh_projects WHERE id = %d",
             $project_id
         ));
         
-        if ($project && $project->user_id == $user_id) {
+        if ($owner_id && $owner_id == $user_id) {
             return true;
         }
         
         // Check if assigned with upload permission
-        $assignment = $wpdb->get_row($wpdb->prepare(
-            "SELECT * FROM {$wpdb->prefix}hamnaghsheh_project_assignments 
+        $has_upload_permission = $wpdb->get_var($wpdb->prepare(
+            "SELECT COUNT(*) FROM {$wpdb->prefix}hamnaghsheh_project_assignments 
              WHERE project_id = %d AND user_id = %d AND permission = 'upload'",
             $project_id,
             $user_id
         ));
         
-        return !empty($assignment);
+        return $has_upload_permission > 0;
     }
 
     public static function render_shortcode()
