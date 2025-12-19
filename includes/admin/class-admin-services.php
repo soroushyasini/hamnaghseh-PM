@@ -19,7 +19,7 @@ class Hamnaghsheh_Admin_Services
             null, // Hidden from menu, accessed via settings
             'مدیریت خدمات',
             'خدمات',
-            'manage_options',
+            'hamnaghsheh_admin',
             'hamnaghsheh-services',
             array($this, 'render_services_page')
         );
@@ -52,7 +52,7 @@ class Hamnaghsheh_Admin_Services
     {
         check_ajax_referer('hamnaghsheh_ajax_nonce', 'nonce');
 
-        if (!current_user_can('manage_options')) {
+        if (!current_user_can('hamnaghsheh_admin')) {
             wp_send_json_error(array('message' => 'دسترسی غیرمجاز.'));
         }
 
