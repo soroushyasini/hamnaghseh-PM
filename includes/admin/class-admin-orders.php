@@ -18,15 +18,10 @@ class Hamnaghsheh_Admin_Orders
      */
     public function add_admin_menu()
     {
-        // Only users with admin capability can access
-        if (!current_user_can('hamnaghsheh_admin')) {
-            return;
-        }
-        
         add_menu_page(
             'سفارش‌ها',
             'سفارش‌ها',
-            'manage_options',
+            'hamnaghsheh_admin',
             'hamnaghsheh-orders',
             array($this, 'render_orders_list'),
             'dashicons-cart',
@@ -37,7 +32,7 @@ class Hamnaghsheh_Admin_Orders
             'hamnaghsheh-orders',
             'همه سفارش‌ها',
             'همه سفارش‌ها',
-            'manage_options',
+            'hamnaghsheh_admin',
             'hamnaghsheh-orders',
             array($this, 'render_orders_list')
         );
@@ -46,7 +41,7 @@ class Hamnaghsheh_Admin_Orders
             'hamnaghsheh-orders',
             'تنظیمات خدمات',
             'تنظیمات خدمات',
-            'manage_options',
+            'hamnaghsheh_admin',
             'hamnaghsheh-services',
             array('Hamnaghsheh_Admin_Services', 'render_services_page_callback')
         );
@@ -56,7 +51,7 @@ class Hamnaghsheh_Admin_Orders
             null,
             'جزئیات سفارش',
             'جزئیات سفارش',
-            'manage_options',
+            'hamnaghsheh_admin',
             'hamnaghsheh-order-detail',
             array($this, 'render_order_detail')
         );
