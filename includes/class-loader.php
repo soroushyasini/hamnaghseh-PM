@@ -95,6 +95,12 @@ class Hamnaghsheh_Loader
 
       wp_register_script('hamnaghsheh-admin-orders', HAMNAGHSHEH_URL . 'assets/js/admin-orders.js', array('jquery'), HAMNAGHSHEH_VERSION, true);
       wp_enqueue_script('hamnaghsheh-admin-orders');
+      
+      // Localize admin script with AJAX data
+      wp_localize_script('hamnaghsheh-admin-orders', 'hamnaghsheh_ajax', array(
+        'ajax_url' => admin_url('admin-ajax.php'),
+        'nonce'    => wp_create_nonce('hamnaghsheh_admin_nonce')
+      ));
     }
   }
 
