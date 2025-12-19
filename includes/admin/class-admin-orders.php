@@ -277,13 +277,19 @@ class Hamnaghsheh_Admin_Orders
                 ));
 
                 if (!$existing) {
-                    $wpdb->insert($assignments_table, array(
+                    $insert_result = $wpdb->insert($assignments_table, array(
                         'project_id' => $project_id,
                         'user_id' => $current_admin_id,
                         'permission' => 'upload',  // Give admin upload permission
                         'assigned_by' => $current_admin_id,
                         'assigned_at' => current_time('mysql')
                     ));
+                    
+                    // Log error if assignment fails, but don't fail the entire operation
+                    // Admin can still access project via hamnaghsheh_admin capability
+                    if ($insert_result === false) {
+                        error_log('Failed to auto-assign admin (ID: ' . $current_admin_id . ') to project (ID: ' . $project_id . '): ' . $wpdb->last_error);
+                    }
                 }
             }
 
