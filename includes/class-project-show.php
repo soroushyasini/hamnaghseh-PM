@@ -142,7 +142,7 @@ class Hamnaghsheh_Project_Show
         }
 
         // ✅ FIX: Ensure admins have full owner-like permissions even if not assigned
-        if (current_user_can('hamnaghsheh_admin') && empty($project->user_permission)) {
+        if (current_user_can('hamnaghsheh_admin') && ($project->user_permission === null || $project->user_permission === '')) {
             $project->user_permission = 'owner';
         }
 
