@@ -233,8 +233,8 @@ $status_label = Hamnaghsheh_Orders::get_status_label($order->status);
 // Ensure hamnaghsheh_ajax is available (fallback if external script loads late)
 if (typeof hamnaghsheh_ajax === 'undefined') {
     var hamnaghsheh_ajax = {
-        ajax_url: '<?php echo admin_url('admin-ajax.php'); ?>',
-        nonce: '<?php echo wp_create_nonce('hamnaghsheh_admin_nonce'); ?>'
+        ajax_url: '<?php echo esc_url(admin_url('admin-ajax.php')); ?>',
+        nonce: '<?php echo esc_js(wp_create_nonce('hamnaghsheh_admin_nonce')); ?>'
     };
 }
 
