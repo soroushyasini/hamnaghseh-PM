@@ -271,28 +271,13 @@ class Hamnaghsheh_Admin_Orders
             if ((int)$current_admin_id !== (int)$order->user_id) {
                 // Use existing method to assign admin to the project
                 // This maintains consistency with the codebase and handles duplicates automatically
-                $assignment_result = Hamnaghsheh_Projects::assign_user_to_project(
+                // Returns false if duplicate exists (shouldn't happen for newly created projects)
+                Hamnaghsheh_Projects::assign_user_to_project(
                     $project_id,
                     $current_admin_id,
                     'upload',  // Give admin upload permission
                     $current_admin_id  // Admin assigns themselves
                 );
-                
-                // Log if assignment fails (returns false when duplicate exists or insert fails)
-                // Admin can still access project via hamnaghsheh_admin capability
-                if ($assignment_result === false) {
-                    // Note: This could be a duplicate (benign) or an actual error
-                    // Check if it's a real error by verifying the assignment doesn't exist
-                    global $wpdb;
-                    $exists = $wpdb->get_var($wpdb->prepare(
-                        "SELECT COUNT(*) FROM {$wpdb->prefix}hamnaghsheh_project_assignments WHERE project_id = %d AND user_id = %d",
-                        $project_id,
-                        $current_admin_id
-                    ));
-                    if (!$exists) {
-                        error_log('Failed to auto-assign admin (ID: ' . $current_admin_id . ') to project (ID: ' . $project_id . ')');
-                    }
-                }
             }
 
             // Log activity
