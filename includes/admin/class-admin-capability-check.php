@@ -29,16 +29,18 @@ class Hamnaghsheh_Admin_Capability_Check
 
         $admin_role = get_role('administrator');
         
-        if ($admin_role && !$admin_role->has_cap('hamnaghsheh_admin')) {
-            // Auto-fix: add the capability
-            $admin_role->add_cap('hamnaghsheh_admin');
+        if ($admin_role) {
+            if (!$admin_role->has_cap('hamnaghsheh_admin')) {
+                // Auto-fix: add the capability
+                $admin_role->add_cap('hamnaghsheh_admin');
+                
+                // Set transient to show notice
+                set_transient('hamnaghsheh_capability_fixed', 1, 10);
+            }
             
-            // Set transient to show notice
-            set_transient('hamnaghsheh_capability_fixed', 1, 10);
+            // Mark as verified only if admin role exists and we processed it
+            update_option('hamnaghsheh_capability_verified', 1, false);
         }
-        
-        // Mark as verified so we don't check again
-        update_option('hamnaghsheh_capability_verified', 1, false);
     }
 
     /**
