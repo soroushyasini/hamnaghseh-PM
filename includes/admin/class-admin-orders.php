@@ -6,8 +6,8 @@ class Hamnaghsheh_Admin_Orders
 {
     public function __construct()
     {
-        // Only users with view_all_orders can access order admin pages
-        if (!current_user_can('view_all_orders')) {
+        // Only users with admin capability can access
+        if (!current_user_can('hamnaghsheh_admin')) {
             return;
         }
         
@@ -128,8 +128,8 @@ class Hamnaghsheh_Admin_Orders
     {
         check_ajax_referer('hamnaghsheh_admin_nonce', 'nonce');
 
-        // Check capability instead of hardcoded role
-        if (!current_user_can('set_order_prices')) {
+        // Check admin capability
+        if (!current_user_can('hamnaghsheh_admin')) {
             wp_send_json_error(array('message' => 'شما دسترسی لازم برای این عملیات را ندارید'));
         }
 
@@ -188,8 +188,8 @@ class Hamnaghsheh_Admin_Orders
     {
         check_ajax_referer('hamnaghsheh_admin_nonce', 'nonce');
 
-        // Check capability
-        if (!current_user_can('manage_orders')) {
+        // Check admin capability
+        if (!current_user_can('hamnaghsheh_admin')) {
             wp_send_json_error(array('message' => 'شما دسترسی لازم برای این عملیات را ندارید'));
         }
 
@@ -221,8 +221,8 @@ class Hamnaghsheh_Admin_Orders
     {
         check_ajax_referer('hamnaghsheh_admin_nonce', 'nonce');
 
-        // Check capability
-        if (!current_user_can('manage_projects')) {
+        // Check admin capability  
+        if (!current_user_can('hamnaghsheh_admin')) {
             wp_send_json_error(array('message' => 'شما دسترسی لازم برای ایجاد پروژه را ندارید'));
         }
 

@@ -10,61 +10,59 @@ Previously, when an admin created a project from a customer's order:
 - Admins would get 404 errors when trying to view these projects
 
 ## Solution
-Implemented a flexible capability system that:
-1. Allows administrators to view all projects via `view_all_projects` capability
-2. Allows administrators to upload to any project via `upload_to_any_project` capability
-3. Provides granular control over order management operations
-4. Maintains backward compatibility with existing access controls
+Implemented a **simple, single capability system** that:
+1. Uses ONE capability `hamnaghsheh_admin` for all admin functions
+2. Allows administrators to view all projects
+3. Allows administrators to upload to any project
+4. Provides full control over order management operations
+5. Maintains backward compatibility with existing access controls
 
 ## Files Modified
 
-### 1. `includes/class-activator.php` - 23 lines added
-- Added `add_custom_capabilities()` method
-- Grants 6 capabilities to administrator role on plugin activation
+### 1. `includes/class-activator.php` - Simplified
+- Updated `add_custom_capabilities()` method
+- Grants **ONE** capability `hamnaghsheh_admin` to administrator role on plugin activation
 
-### 2. `includes/class-project-show.php` - 94 lines changed
-- Added `can_user_access_project()` method with capability check
-- Added `can_user_upload_to_project()` method with capability check
+### 2. `includes/class-project-show.php` - Updated
+- Updated `can_user_access_project()` to check `hamnaghsheh_admin` capability
+- Updated `can_user_upload_to_project()` to check `hamnaghsheh_admin` capability
 - Optimized database queries (SELECT specific fields vs SELECT *)
-- Updated `render_shortcode()` to use capability-based checks
 
-### 3. `includes/class-upload-file.php` - 10 lines changed
-- Added `upload_to_any_project` capability check in `upload_file()`
-- Added `upload_to_any_project` capability check in `replace_file()`
+### 3. `includes/class-upload-file.php` - Updated
+- Updated `upload_file()` to check `hamnaghsheh_admin` capability
+- Updated `replace_file()` to check `hamnaghsheh_admin` capability
 
-### 4. `includes/admin/class-admin-orders.php` - 20 lines changed
-- Added `view_all_orders` capability check in constructor
-- Updated AJAX handlers to use specific capabilities instead of `manage_options`
+### 4. `includes/admin/class-admin-orders.php` - Updated
+- Updated constructor to check `hamnaghsheh_admin` capability
+- Updated all AJAX handlers to use `hamnaghsheh_admin` instead of separate capabilities
 
-### 5. `includes/class-deactivator.php` - 21 lines added
-- Added `remove_custom_capabilities()` method for cleanup
+### 5. `includes/class-deactivator.php` - Updated
+- Updated `remove_custom_capabilities()` to remove `hamnaghsheh_admin`
 
-### 6. `docs/CAPABILITIES.md` - 163 lines (new file)
-- Comprehensive documentation of all capabilities
+### 6. `docs/CAPABILITIES.md` - Updated
+- Comprehensive documentation of the `hamnaghsheh_admin` capability
 - Usage examples and troubleshooting guide
 
-## Custom Capabilities Added
+## Custom Capability
 
-### Project Capabilities
-- `view_all_projects` - View any project without being assigned
-- `manage_projects` - Create, edit, and delete projects  
-- `upload_to_any_project` - Upload files to any project
-
-### Order Capabilities
-- `view_all_orders` - View all orders in admin panel
-- `manage_orders` - Edit order details and manage workflow
-- `set_order_prices` - Set final prices and change order status
+### The Single Admin Capability
+- `hamnaghsheh_admin` - **ONE capability for all admin functions**
+  - View any project
+  - Upload to any project  
+  - Manage all orders
+  - Set prices
+  - Create projects
 
 ## Access Control Logic
 
 ### Project Viewing
-1. Has `view_all_projects` capability? → GRANT ACCESS
+1. Has `hamnaghsheh_admin` capability? → GRANT ACCESS
 2. Is project owner? → GRANT ACCESS
 3. Is assigned to project? → GRANT ACCESS
 4. Otherwise → DENY ACCESS
 
 ### File Upload
-1. Has `upload_to_any_project` capability? → ALLOW UPLOAD
+1. Has `hamnaghsheh_admin` capability? → ALLOW UPLOAD
 2. Is project owner? → ALLOW UPLOAD
 3. Is assigned with 'upload' permission? → ALLOW UPLOAD
 4. Otherwise → DENY UPLOAD
@@ -78,10 +76,10 @@ Implemented a flexible capability system that:
 2. Deactivate "Hamnaghseh PM"
 3. Reactivate "Hamnaghseh PM"
 
-This triggers the `add_custom_capabilities()` method to grant the new capabilities to administrators.
+This triggers the `add_custom_capabilities()` method to grant the new capability to administrators.
 
 ### For New Installations
-Capabilities are automatically assigned during first activation.
+The capability is automatically assigned during first activation.
 
 ## Testing Checklist
 
@@ -98,19 +96,20 @@ After deployment and reactivation:
 
 ## Benefits
 
-✅ **Flexible**: Can assign capabilities to any role or user  
-✅ **Scalable**: Easy to add multiple administrators  
+✅ **Simple**: Just ONE capability instead of six  
+✅ **Clear**: Either admin or not, no confusion  
+✅ **Easy to grant**: One checkbox for full access  
+✅ **Scalable**: Can create custom roles later if needed  
 ✅ **Secure**: Fine-grained permission control  
 ✅ **Standard**: Uses WordPress capability system  
-✅ **Future-proof**: Easy to create custom roles (Project Manager, etc.)  
 ✅ **Backward Compatible**: Existing access preserved  
-✅ **Performance Optimized**: Efficient database queries  
+✅ **Maintainable**: Less code, less complexity  
 
 ## Summary Statistics
 
-- **Files Modified**: 6
-- **Total Changes**: +312 lines, -19 lines
-- **New Capabilities**: 6
+- **Files Modified**: 5 core files + 2 documentation files
+- **Total Changes**: +24 lines, -37 lines (net reduction of 13 lines)
+- **Capabilities**: 1 (simplified from 6)
 - **Security Issues**: 0
 - **Breaking Changes**: 0
 - **Code Review**: ✅ Completed

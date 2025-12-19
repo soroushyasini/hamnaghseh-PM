@@ -13,9 +13,8 @@ class Hamnaghsheh_Project_Show
      */
     private static function can_user_access_project($project_id, $user_id)
     {
-        // Users with 'view_all_projects' capability can see everything
-        // This applies to administrators and any custom roles granted this capability
-        if (current_user_can('view_all_projects')) {
+        // Users with hamnaghsheh_admin capability have full access
+        if (current_user_can('hamnaghsheh_admin')) {
             return true;
         }
         
@@ -55,8 +54,8 @@ class Hamnaghsheh_Project_Show
      */
     private static function can_user_upload_to_project($project_id, $user_id)
     {
-        // Users with upload_to_any_project can upload anywhere
-        if (current_user_can('upload_to_any_project')) {
+        // Admins can upload to any project
+        if (current_user_can('hamnaghsheh_admin')) {
             return true;
         }
         
