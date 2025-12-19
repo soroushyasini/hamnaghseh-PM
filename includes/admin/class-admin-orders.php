@@ -262,6 +262,29 @@ class Hamnaghsheh_Admin_Orders
                 array('id' => $order_id)
             );
 
+            // ✅ AUTO-ASSIGN: Assign the admin who created the project
+            // This ensures admins can access and manage projects they create from orders
+            $current_admin_id = get_current_user_id();
+
+            // Only assign if the admin is not already the project owner
+            // Cast to int to ensure we're comparing integers (handles string vs int mismatch)
+            if ((int)$current_admin_id !== (int)$order->user_id) {
+                // Use existing method to assign admin to the project
+                // This maintains consistency with the codebase and handles duplicates automatically
+                // Returns false if duplicate exists (shouldn't happen for newly created projects)
+                $assigned = Hamnaghsheh_Projects::assign_user_to_project(
+                    $project_id,
+                    $current_admin_id,
+                    'upload',  // Give admin upload permission
+                    $current_admin_id  // Admin assigns themselves
+                );
+                
+                // Log if assignment unexpectedly fails (admin can still access via capability)
+                if ($assigned === false) {
+                    error_log('Auto-assign failed for admin ' . $current_admin_id . ' to project ' . $project_id);
+                }
+            }
+
             // Log activity
             Hamnaghsheh_Order_Activity::log_activity(
                 $order_id,
