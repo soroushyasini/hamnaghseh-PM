@@ -267,17 +267,22 @@ class Hamnaghsheh_Admin_Orders
             $current_admin_id = get_current_user_id();
 
             // Only assign if the admin is not already the project owner
-            // Use strict comparison with type casting to ensure integer comparison
+            // Cast to int to ensure we're comparing integers (handles string vs int mismatch)
             if ((int)$current_admin_id !== (int)$order->user_id) {
                 // Use existing method to assign admin to the project
                 // This maintains consistency with the codebase and handles duplicates automatically
                 // Returns false if duplicate exists (shouldn't happen for newly created projects)
-                Hamnaghsheh_Projects::assign_user_to_project(
+                $assigned = Hamnaghsheh_Projects::assign_user_to_project(
                     $project_id,
                     $current_admin_id,
                     'upload',  // Give admin upload permission
                     $current_admin_id  // Admin assigns themselves
                 );
+                
+                // Log if assignment unexpectedly fails (admin can still access via capability)
+                if ($assigned === false) {
+                    error_log('Auto-assign failed for admin ' . $current_admin_id . ' to project ' . $project_id);
+                }
             }
 
             // Log activity
