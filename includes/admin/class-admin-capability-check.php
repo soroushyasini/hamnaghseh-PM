@@ -47,9 +47,11 @@ class Hamnaghsheh_Admin_Capability_Check
     public function show_capability_notice()
     {
         if (get_transient('hamnaghsheh_capability_fixed') && !$this->notice_shown) {
-            echo '<div class="notice notice-success is-dismissible">';
-            echo '<p><strong>همنقشه PM:</strong> دسترسی‌های مدیر به‌روزرسانی شد. لطفاً صفحه را بازخوانی کنید.</p>';
-            echo '</div>';
+            ?>
+            <div class="notice notice-success is-dismissible">
+                <p><strong><?php echo esc_html('همنقشه PM'); ?>:</strong> <?php echo esc_html('دسترسی‌های مدیر به‌روزرسانی شد. لطفاً صفحه را بازخوانی کنید.'); ?></p>
+            </div>
+            <?php
             $this->notice_shown = true;
             delete_transient('hamnaghsheh_capability_fixed');
         }
