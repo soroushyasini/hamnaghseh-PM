@@ -55,6 +55,8 @@ class Hamnaghsheh_Loader
     
     // Initialize admin classes if in admin
     if (is_admin()) {
+      require_once HAMNAGHSHEH_DIR . 'includes/admin/class-admin-capability-check.php';
+      new Hamnaghsheh_Admin_Capability_Check();
       new Hamnaghsheh_Admin_Services();
       new Hamnaghsheh_Admin_Orders();
     }

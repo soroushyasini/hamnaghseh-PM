@@ -274,7 +274,19 @@ class Hamnaghsheh_Activator
         $admin_role = get_role('administrator');
         
         if ($admin_role) {
-            $admin_role->add_cap('hamnaghsheh_admin');
+            // Add the capability if it doesn't exist
+            if (!$admin_role->has_cap('hamnaghsheh_admin')) {
+                $admin_role->add_cap('hamnaghsheh_admin');
+            }
         }
+    }
+
+    /**
+     * Ensure capability is added even on existing installations
+     * This runs every time but only adds if missing
+     */
+    public static function ensure_capabilities()
+    {
+        self::add_custom_capabilities();
     }
 }
