@@ -6,11 +6,6 @@ class Hamnaghsheh_Admin_Orders
 {
     public function __construct()
     {
-        // Only users with admin capability can access
-        if (!current_user_can('hamnaghsheh_admin')) {
-            return;
-        }
-        
         add_action('admin_menu', array($this, 'add_admin_menu'));
         // SIMPLIFIED VERSION: Remove quote and messaging, add simple price setter
         add_action('wp_ajax_hamnaghsheh_admin_set_price', array($this, 'ajax_set_price'));
@@ -23,6 +18,11 @@ class Hamnaghsheh_Admin_Orders
      */
     public function add_admin_menu()
     {
+        // Only users with admin capability can access
+        if (!current_user_can('hamnaghsheh_admin')) {
+            return;
+        }
+        
         add_menu_page(
             'سفارش‌ها',
             'سفارش‌ها',
