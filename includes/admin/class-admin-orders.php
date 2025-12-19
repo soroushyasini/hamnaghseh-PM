@@ -268,7 +268,8 @@ class Hamnaghsheh_Admin_Orders
             $current_admin_id = get_current_user_id();
 
             // Only assign if the admin is not already the project owner
-            if ($current_admin_id != $order->user_id) {
+            // Use strict comparison with type casting to ensure integer comparison
+            if ((int)$current_admin_id !== (int)$order->user_id) {
                 // Check if assignment already exists to avoid duplicates
                 $existing = $wpdb->get_var($wpdb->prepare(
                     "SELECT COUNT(*) FROM {$assignments_table} WHERE project_id = %d AND user_id = %d",
@@ -277,12 +278,12 @@ class Hamnaghsheh_Admin_Orders
                 ));
 
                 if (!$existing) {
+                    // Insert assignment (assigned_at uses database default timestamp)
                     $insert_result = $wpdb->insert($assignments_table, array(
                         'project_id' => $project_id,
                         'user_id' => $current_admin_id,
                         'permission' => 'upload',  // Give admin upload permission
-                        'assigned_by' => $current_admin_id,
-                        'assigned_at' => current_time('mysql')
+                        'assigned_by' => $current_admin_id
                     ));
                     
                     // Log error if assignment fails, but don't fail the entire operation
