@@ -264,34 +264,33 @@ class Hamnaghsheh_Admin_Orders
 
             // ✅ AUTO-ASSIGN: Assign the admin who created the project
             // This ensures admins can access and manage projects they create from orders
-            $assignments_table = $wpdb->prefix . 'hamnaghsheh_project_assignments';
             $current_admin_id = get_current_user_id();
 
             // Only assign if the admin is not already the project owner
             // Use strict comparison with type casting to ensure integer comparison
             if ((int)$current_admin_id !== (int)$order->user_id) {
-                // Check if assignment already exists to avoid duplicates
-                // Use EXISTS check with LIMIT 1 for better performance
-                $existing = $wpdb->get_var($wpdb->prepare(
-                    "SELECT 1 FROM {$assignments_table} WHERE project_id = %d AND user_id = %d LIMIT 1",
+                // Use existing method to assign admin to the project
+                // This maintains consistency with the codebase and handles duplicates automatically
+                $assignment_result = Hamnaghsheh_Projects::assign_user_to_project(
                     $project_id,
-                    $current_admin_id
-                ));
-
-                if (!$existing) {
-                    // Insert assignment
-                    // Note: 'assigned_at' field is intentionally omitted to use database DEFAULT CURRENT_TIMESTAMP
-                    $insert_result = $wpdb->insert($assignments_table, array(
-                        'project_id' => $project_id,
-                        'user_id' => $current_admin_id,
-                        'permission' => 'upload',  // Give admin upload permission
-                        'assigned_by' => $current_admin_id
+                    $current_admin_id,
+                    'upload',  // Give admin upload permission
+                    $current_admin_id  // Admin assigns themselves
+                );
+                
+                // Log if assignment fails (returns false when duplicate exists or insert fails)
+                // Admin can still access project via hamnaghsheh_admin capability
+                if ($assignment_result === false) {
+                    // Note: This could be a duplicate (benign) or an actual error
+                    // Check if it's a real error by verifying the assignment doesn't exist
+                    global $wpdb;
+                    $exists = $wpdb->get_var($wpdb->prepare(
+                        "SELECT COUNT(*) FROM {$wpdb->prefix}hamnaghsheh_project_assignments WHERE project_id = %d AND user_id = %d",
+                        $project_id,
+                        $current_admin_id
                     ));
-                    
-                    // Log error if assignment fails, but don't fail the entire operation
-                    // Admin can still access project via hamnaghsheh_admin capability
-                    if ($insert_result === false) {
-                        error_log('Failed to auto-assign admin (ID: ' . $current_admin_id . ') to project (ID: ' . $project_id . '): ' . $wpdb->last_error);
+                    if (!$exists) {
+                        error_log('Failed to auto-assign admin (ID: ' . $current_admin_id . ') to project (ID: ' . $project_id . ')');
                     }
                 }
             }
