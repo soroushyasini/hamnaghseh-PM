@@ -230,6 +230,14 @@ $status_label = Hamnaghsheh_Orders::get_status_label($order->status);
 </div>
 
 <script>
+// Ensure hamnaghsheh_ajax is available (fallback if external script loads late)
+if (typeof hamnaghsheh_ajax === 'undefined') {
+    var hamnaghsheh_ajax = {
+        ajax_url: '<?php echo esc_url(admin_url('admin-ajax.php')); ?>',
+        nonce: '<?php echo esc_js(wp_create_nonce('hamnaghsheh_admin_nonce')); ?>'
+    };
+}
+
 jQuery(document).ready(function($) {
     // Save changes
     $('#price-form').on('submit', function(e) {
