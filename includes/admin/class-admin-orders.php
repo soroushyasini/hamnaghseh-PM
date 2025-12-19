@@ -262,6 +262,31 @@ class Hamnaghsheh_Admin_Orders
                 array('id' => $order_id)
             );
 
+            // ✅ AUTO-ASSIGN: Assign the admin who created the project
+            // This ensures admins can access and manage projects they create from orders
+            $assignments_table = $wpdb->prefix . 'hamnaghsheh_project_assignments';
+            $current_admin_id = get_current_user_id();
+
+            // Only assign if the admin is not already the project owner
+            if ($current_admin_id != $order->user_id) {
+                // Check if assignment already exists to avoid duplicates
+                $existing = $wpdb->get_var($wpdb->prepare(
+                    "SELECT COUNT(*) FROM {$assignments_table} WHERE project_id = %d AND user_id = %d",
+                    $project_id,
+                    $current_admin_id
+                ));
+
+                if (!$existing) {
+                    $wpdb->insert($assignments_table, array(
+                        'project_id' => $project_id,
+                        'user_id' => $current_admin_id,
+                        'permission' => 'upload',  // Give admin upload permission
+                        'assigned_by' => $current_admin_id,
+                        'assigned_at' => current_time('mysql')
+                    ));
+                }
+            }
+
             // Log activity
             Hamnaghsheh_Order_Activity::log_activity(
                 $order_id,
