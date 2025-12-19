@@ -25,11 +25,17 @@ class Hamnaghsheh_Admin_Capability_Check
             // Auto-fix: add the capability
             $admin_role->add_cap('hamnaghsheh_admin');
             
+            // Set transient to show notice only once
+            set_transient('hamnaghsheh_capability_fixed', 1, 60);
+            
             // Add admin notice
             add_action('admin_notices', function() {
-                echo '<div class="notice notice-success is-dismissible">';
-                echo '<p><strong>Hamnaghsheh PM:</strong> Admin capabilities have been updated. Please refresh the page.</p>';
-                echo '</div>';
+                if (get_transient('hamnaghsheh_capability_fixed')) {
+                    echo '<div class="notice notice-success is-dismissible">';
+                    echo '<p><strong>همنقشه PM:</strong> دسترسی‌های مدیر به‌روزرسانی شد. لطفاً صفحه را بازخوانی کنید.</p>';
+                    echo '</div>';
+                    delete_transient('hamnaghsheh_capability_fixed');
+                }
             });
         }
     }
