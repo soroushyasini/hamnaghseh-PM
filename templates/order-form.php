@@ -1,5 +1,5 @@
 <?php
-if (!defined('ABSPATH'))
+if (! defined('ABSPATH'))
     exit;
 ?>
 
@@ -7,7 +7,7 @@ if (!defined('ABSPATH'))
     <div class="max-w-4xl mx-auto">
         <div class="mb-8">
             <h1 class="font-black text-2xl xl:text-3xl mb-3 text-[#09375B]">جزئیات سفارش</h1>
-            <p class="text-gray-600">لطفاً اطلاعات سفارش خود را تکمیل کنید.</p>
+            <p class="text-gray-600">لطفاً اطلاعات سفارش خود را تکمیل کنید. </p>
             <div class="bg-yellow-50 border-r-4 border-yellow-400 p-4 mt-4">
                 <p class="text-sm text-yellow-800">
                     <strong>توجه:</strong> کارشناس ما پس از بررسی سفارش با شما تماس خواهد گرفت تا قیمت نهایی را تعیین کند.
@@ -33,7 +33,7 @@ if (!defined('ABSPATH'))
                         <span id="summary-price" class="font-semibold mr-2">-</span>
                     </div>
                     <div>
-                        <span class="text-gray-600">مجموع:</span>
+                        <span class="text-gray-600">مجموع: </span>
                         <span id="summary-total" class="font-semibold mr-2 text-green-600">-</span>
                     </div>
                 </div>
@@ -51,7 +51,7 @@ if (!defined('ABSPATH'))
                     آدرس دقیق <span class="text-red-500">*</span>
                 </label>
                 <textarea name="address" id="address" rows="3" required
-                          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus: ring-2 focus:ring-blue-500"
                           placeholder="آدرس محل پروژه را به طور دقیق وارد کنید"></textarea>
             </div>
 
@@ -88,9 +88,10 @@ if (!defined('ABSPATH'))
             <!-- Disclaimer -->
             <div class="mb-6 p-4 bg-yellow-50 border-r-4 border-yellow-400 rounded">
                 <div class="flex items-start">
-                    <input type="checkbox" id="disclaimer_accept" required class="mt-1 ml-3">
+                    <input type="checkbox" id="disclaimer_accept" required class="mt-1 ml-3"
+                           onchange="document.getElementById('submit_order_btn').disabled = !this.checked">
                     <label for="disclaimer_accept" class="text-sm text-gray-700">
-                        <strong>توجه:</strong> پروژه‌های نقشه‌برداری ممکن است در عمل با زمان مورد نظر شما تفاوت داشته باشند. 
+                        <strong>توجه: </strong> پروژه‌های نقشه‌برداری ممکن است در عمل با زمان مورد نظر شما تفاوت داشته باشند.  
                         کارشناسان ما پس از بررسی اولیه، برآورد نهایی را برای شما ارسال خواهند کرد. 
                         با ثبت این سفارش، شما این موضوع را می‌پذیرید.
                     </label>
@@ -99,8 +100,8 @@ if (!defined('ABSPATH'))
 
             <!-- Submit Button -->
             <div class="flex gap-4">
-                <button type="submit" 
-                        class="flex-1 bg-[#FFCF00] hover:bg-[#e6bd00] text-[#09375B] font-bold py-3 px-6 rounded transition-all">
+                <button type="submit" id="submit_order_btn" disabled
+                        class="flex-1 bg-[#FFCF00] hover:bg-[#e6bd00] text-[#09375B] font-bold py-3 px-6 rounded transition-all disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed">
                     ثبت سفارش
                 </button>
                 <a href="<?php echo site_url('/services/'); ?>" 
@@ -143,11 +144,11 @@ jQuery(document).ready(function($) {
         var formData = $(this).serialize();
         
         $.ajax({
-            url: hamnaghsheh_ajax.ajax_url,
-            type: 'POST',
-            data: formData + '&action=hamnaghsheh_submit_order&nonce=' + hamnaghsheh_ajax.nonce,
+            url: hamnaghsheh_ajax. ajax_url,
+            type:  'POST',
+            data:  formData + '&action=hamnaghsheh_submit_order&nonce=' + hamnaghsheh_ajax.nonce,
             beforeSend: function() {
-                $('button[type="submit"]').prop('disabled', true).text('در حال ثبت...');
+                $('#submit_order_btn').prop('disabled', true).text('در حال ثبت.. .');
             },
             success: function(response) {
                 if (response.success) {
@@ -155,13 +156,17 @@ jQuery(document).ready(function($) {
                     alert(response.data.message);
                     window.location.href = response.data.redirect;
                 } else {
-                    alert(response.data.message);
-                    $('button[type="submit"]').prop('disabled', false).text('ثبت سفارش');
+                    alert(response.data. message);
+                    // Re-enable button only if disclaimer is still checked
+                    var isChecked = $('#disclaimer_accept').is(': checked');
+                    $('#submit_order_btn').prop('disabled', !isChecked).text('ثبت سفارش');
                 }
             },
             error: function() {
                 alert('خطا در ارتباط با سرور. لطفاً دوباره تلاش کنید.');
-                $('button[type="submit"]').prop('disabled', false).text('ثبت سفارش');
+                // Re-enable button only if disclaimer is still checked
+                var isChecked = $('#disclaimer_accept').is(':checked');
+                $('#submit_order_btn').prop('disabled', !isChecked).text('ثبت سفارش');
             }
         });
     });
