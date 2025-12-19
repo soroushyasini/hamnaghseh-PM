@@ -121,7 +121,7 @@ class Hamnaghsheh_Admin_Orders
      */
     public function ajax_set_price()
     {
-        check_ajax_referer('hamnaghsheh_ajax_nonce', 'nonce');
+        check_ajax_referer('hamnaghsheh_admin_nonce', 'nonce');
 
         if (!current_user_can('manage_options')) {
             wp_send_json_error(array('message' => 'دسترسی غیرمجاز.'));
@@ -180,7 +180,7 @@ class Hamnaghsheh_Admin_Orders
      */
     public function ajax_update_status()
     {
-        check_ajax_referer('hamnaghsheh_ajax_nonce', 'nonce');
+        check_ajax_referer('hamnaghsheh_admin_nonce', 'nonce');
 
         if (!current_user_can('manage_options')) {
             wp_send_json_error(array('message' => 'دسترسی غیرمجاز.'));
@@ -212,7 +212,7 @@ class Hamnaghsheh_Admin_Orders
      */
     public function ajax_create_project()
     {
-        check_ajax_referer('hamnaghsheh_ajax_nonce', 'nonce');
+        check_ajax_referer('hamnaghsheh_admin_nonce', 'nonce');
 
         if (!current_user_can('manage_options')) {
             wp_send_json_error(array('message' => 'دسترسی غیرمجاز.'));
