@@ -251,23 +251,16 @@ class Hamnaghsheh_Activator
     }
     
     /**
-     * Add custom capabilities to roles
-     * Grants capabilities to administrator role for flexible access control
+     * Add hamnaghsheh_admin capability to Administrator role
+     * This single capability grants full access to all plugin features
      */
     private static function add_custom_capabilities()
     {
         $admin_role = get_role('administrator');
         
         if ($admin_role) {
-            // Project capabilities
-            $admin_role->add_cap('view_all_projects');
-            $admin_role->add_cap('manage_projects');
-            $admin_role->add_cap('upload_to_any_project');
-            
-            // Order capabilities
-            $admin_role->add_cap('view_all_orders');
-            $admin_role->add_cap('manage_orders');
-            $admin_role->add_cap('set_order_prices');
+            // ONE capability for all admin functions
+            $admin_role->add_cap('hamnaghsheh_admin');
         }
     }
 }

@@ -9,20 +9,15 @@ class Hamnaghsheh_Deactivator {
     }
     
     /**
-     * Remove custom capabilities from all roles
+     * Remove hamnaghsheh_admin capability from all roles
      */
     private static function remove_custom_capabilities() {
-        $roles = array('administrator', 'editor', 'project_manager'); // Add custom roles if any
+        global $wp_roles;
         
-        foreach ($roles as $role_name) {
+        foreach ($wp_roles->roles as $role_name => $role_info) {
             $role = get_role($role_name);
             if ($role) {
-                $role->remove_cap('view_all_projects');
-                $role->remove_cap('manage_projects');
-                $role->remove_cap('upload_to_any_project');
-                $role->remove_cap('view_all_orders');
-                $role->remove_cap('manage_orders');
-                $role->remove_cap('set_order_prices');
+                $role->remove_cap('hamnaghsheh_admin');
             }
         }
     }
