@@ -4,6 +4,84 @@ if (!defined('ABSPATH'))
 
 class Hamnaghsheh_Project_Show
 {
+    /**
+     * Check if user can access a project
+     * 
+     * @param int $project_id Project ID
+     * @param int $user_id User ID
+     * @return bool
+     */
+    private static function can_user_access_project($project_id, $user_id)
+    {
+        // Users with 'view_all_projects' capability can see everything
+        // This applies to administrators and any custom roles granted this capability
+        if (current_user_can('view_all_projects')) {
+            return true;
+        }
+        
+        global $wpdb;
+        
+        // Check if user is the project owner
+        $owner_id = $wpdb->get_var($wpdb->prepare(
+            "SELECT user_id FROM {$wpdb->prefix}hamnaghsheh_projects WHERE id = %d",
+            $project_id
+        ));
+        
+        if (!$owner_id) {
+            return false; // Project doesn't exist
+        }
+        
+        if ($owner_id == $user_id) {
+            return true; // Owner has access
+        }
+        
+        // Check if user is assigned to the project
+        $is_assigned = $wpdb->get_var($wpdb->prepare(
+            "SELECT COUNT(*) FROM {$wpdb->prefix}hamnaghsheh_project_assignments 
+             WHERE project_id = %d AND user_id = %d",
+            $project_id,
+            $user_id
+        ));
+        
+        return $is_assigned > 0;
+    }
+    
+    /**
+     * Check if user can upload to a project
+     * 
+     * @param int $project_id Project ID
+     * @param int $user_id User ID
+     * @return bool
+     */
+    private static function can_user_upload_to_project($project_id, $user_id)
+    {
+        // Users with upload_to_any_project can upload anywhere
+        if (current_user_can('upload_to_any_project')) {
+            return true;
+        }
+        
+        global $wpdb;
+        
+        // Check if owner
+        $owner_id = $wpdb->get_var($wpdb->prepare(
+            "SELECT user_id FROM {$wpdb->prefix}hamnaghsheh_projects WHERE id = %d",
+            $project_id
+        ));
+        
+        if ($owner_id && $owner_id == $user_id) {
+            return true;
+        }
+        
+        // Check if assigned with upload permission
+        $has_upload_permission = $wpdb->get_var($wpdb->prepare(
+            "SELECT COUNT(*) FROM {$wpdb->prefix}hamnaghsheh_project_assignments 
+             WHERE project_id = %d AND user_id = %d AND permission = 'upload'",
+            $project_id,
+            $user_id
+        ));
+        
+        return $has_upload_permission > 0;
+    }
 
     public static function render_shortcode()
     {
@@ -31,6 +109,11 @@ class Hamnaghsheh_Project_Show
 
 
         $project_id = (int) $project_id;
+        
+        // Use capability-based access check
+        if (!self::can_user_access_project($project_id, $current_user_id)) {
+            return '<div class="hamnaghsheh-notice text-red-800 bg-red-100 w-full p-4 rounded-lg text-md text-center">شما به این پروژه دسترسی ندارید</div>';
+        }
 
         $query = $wpdb->prepare("
                 SELECT 
@@ -65,17 +148,6 @@ class Hamnaghsheh_Project_Show
 
         // بررسی مالکیت یا assign بودن کاربر
         $is_owner = ($project->user_id == $current_user_id);
-
-        $is_assigned = $wpdb->get_var($wpdb->prepare("
-            SELECT COUNT(*) 
-            FROM $table_assigns 
-            WHERE project_id = %d AND user_id = %d
-        ", $project_id, $current_user_id));
-
-        // اگر نه مالک بود و نه assign شده
-        if (!$is_owner && !$is_assigned) {
-            return '<div class="hamnaghsheh-notice text-red-800 bg-red-100 w-full p-4 rounded-lg text-md text-center">شما به این پروژه دسترسی ندارید</div>';
-        }
 
         // $owner_id = $wpdb->get_var($wpdb->prepare("
         //     SELECT user_id FROM $table_projects WHERE id = %d

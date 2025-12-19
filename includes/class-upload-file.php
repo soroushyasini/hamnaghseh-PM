@@ -47,7 +47,10 @@ class Hamnaghsheh_File_Upload
         $is_owner = ($project->user_id == $user_id);
         $has_permission = false;
 
-        if ($is_owner) {
+        // Users with upload_to_any_project capability can upload anywhere
+        if (current_user_can('upload_to_any_project')) {
+            $has_permission = true;
+        } elseif ($is_owner) {
             $has_permission = true;
         } else {
             // بررسی اگر کاربر از طریق لینک اسایگن شده باشد
@@ -229,7 +232,10 @@ class Hamnaghsheh_File_Upload
         $is_owner = ($project->user_id == $user_id);
         $has_permission = false;
 
-        if ($is_owner) {
+        // Users with upload_to_any_project capability can upload anywhere
+        if (current_user_can('upload_to_any_project')) {
+            $has_permission = true;
+        } elseif ($is_owner) {
             $has_permission = true;
         } else {
             $assign = $wpdb->get_row($wpdb->prepare("
