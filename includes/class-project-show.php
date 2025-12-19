@@ -141,6 +141,11 @@ class Hamnaghsheh_Project_Show
             return '<div class="hamnaghsheh-notice text-red-800 bg-red-100 w-full p-4 rounded-lg text-md text-center">پروژه مورد نظر یافت نشد</div>';
         }
 
+        // ✅ FIX: Ensure admins have full owner-like permissions even if not assigned
+        if (current_user_can('hamnaghsheh_admin') && ($project->user_permission === null || $project->user_permission === '')) {
+            $project->user_permission = 'owner';
+        }
+
         if ($project->archive != 0) {
             return '<div class="hamnaghsheh-notice text-red-800 bg-red-100 w-full p-4 rounded-lg text-md text-center">پروژه مورد نظر یافت نشد</div>';
         }
