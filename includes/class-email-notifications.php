@@ -251,7 +251,7 @@ class Hamnaghsheh_Email_Notifications
             <div class="info-box">
                 <div class="info-row">
                     <span class="info-label">شماره سفارش:</span>
-                    <span class="info-value">' . $order->order_number . '</span>
+                    <span class="info-value">' . esc_html($order->order_number) . '</span>
                 </div>
                 <div class="info-row">
                     <span class="info-label">نام مشتری:</span>
@@ -267,19 +267,19 @@ class Hamnaghsheh_Email_Notifications
                 </div>
                 <div class="info-row">
                     <span class="info-label">خدمات:</span>
-                    <span class="info-value">' . $service->service_name_fa . '</span>
+                    <span class="info-value">' . esc_html($service->service_name_fa) . '</span>
                 </div>
                 <div class="info-row">
                     <span class="info-label">تعداد جلسات:</span>
-                    <span class="info-value">' . $order->requested_quantity . '</span>
+                    <span class="info-value">' . intval($order->requested_quantity) . '</span>
                 </div>
                 <div class="info-row">
                     <span class="info-label">آدرس:</span>
-                    <span class="info-value">' . $order->address . '</span>
+                    <span class="info-value">' . esc_html($order->address) . '</span>
                 </div>
                 <div class="info-row">
                     <span class="info-label">متراژ:</span>
-                    <span class="info-value">' . $order->area_size . '</span>
+                    <span class="info-value">' . esc_html($order->area_size) . '</span>
                 </div>
                 <div class="info-row">
                     <span class="info-label">قیمت درخواستی:</span>
@@ -342,15 +342,15 @@ class Hamnaghsheh_Email_Notifications
             <div class="info-box">
                 <div class="info-row">
                     <span class="info-label">شماره سفارش:</span>
-                    <span class="info-value">' . $order->order_number . '</span>
+                    <span class="info-value">' . esc_html($order->order_number) . '</span>
                 </div>
                 <div class="info-row">
                     <span class="info-label">خدمات:</span>
-                    <span class="info-value">' . $service->service_name_fa . '</span>
+                    <span class="info-value">' . esc_html($service->service_name_fa) . '</span>
                 </div>
                 <div class="info-row">
                     <span class="info-label">تعداد جلسات:</span>
-                    <span class="info-value">' . $order->requested_quantity . '</span>
+                    <span class="info-value">' . intval($order->requested_quantity) . '</span>
                 </div>
                 <div class="info-row">
                     <span class="info-label">قیمت درخواستی:</span>
@@ -405,11 +405,11 @@ class Hamnaghsheh_Email_Notifications
             <div class="info-box">
                 <div class="info-row">
                     <span class="info-label">شماره سفارش:</span>
-                    <span class="info-value">' . $order->order_number . '</span>
+                    <span class="info-value">' . esc_html($order->order_number) . '</span>
                 </div>
                 <div class="info-row">
                     <span class="info-label">خدمات:</span>
-                    <span class="info-value">' . $service->service_name_fa . '</span>
+                    <span class="info-value">' . esc_html($service->service_name_fa) . '</span>
                 </div>
                 <div class="info-row">
                     <span class="info-label">قیمت نهایی:</span>
@@ -469,11 +469,11 @@ class Hamnaghsheh_Email_Notifications
             <div class="info-box">
                 <div class="info-row">
                     <span class="info-label">شماره سفارش:</span>
-                    <span class="info-value">' . $order->order_number . '</span>
+                    <span class="info-value">' . esc_html($order->order_number) . '</span>
                 </div>
                 <div class="info-row">
                     <span class="info-label">خدمات:</span>
-                    <span class="info-value">' . $service->service_name_fa . '</span>
+                    <span class="info-value">' . esc_html($service->service_name_fa) . '</span>
                 </div>
                 <div class="info-row">
                     <span class="info-label">مبلغ پرداختی:</span>
@@ -579,15 +579,15 @@ class Hamnaghsheh_Email_Notifications
             <div class="info-box">
                 <div class="info-row">
                     <span class="info-label">شماره سفارش:</span>
-                    <span class="info-value">' . $order->order_number . '</span>
+                    <span class="info-value">' . esc_html($order->order_number) . '</span>
                 </div>
                 <div class="info-row">
                     <span class="info-label">خدمات:</span>
-                    <span class="info-value">' . $service->service_name_fa . '</span>
+                    <span class="info-value">' . esc_html($service->service_name_fa) . '</span>
                 </div>
                 <div class="info-row">
                     <span class="info-label">شناسه پروژه:</span>
-                    <span class="info-value">' . $order->project_id . '</span>
+                    <span class="info-value">' . intval($order->project_id) . '</span>
                 </div>
             </div>
             
