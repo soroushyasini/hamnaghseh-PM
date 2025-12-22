@@ -48,9 +48,16 @@ class Hamnaghsheh_Email_Notifications
         // Cumulative days in Gregorian months for date conversion
         $g_d_m = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
         $gy2 = ($gm > 2) ? ($gy + 1) : $gy;
+        
+        // Calculate total days since a reference point (355666 is the base offset)
+        // Algorithm accounts for leap years using divisibility rules (4, 100, 400)
         $days = 355666 + (365 * $gy) + (int)(($gy2 + 3) / 4) - (int)(($gy2 + 99) / 100) + (int)(($gy2 + 399) / 400) + $gd + $g_d_m[$gm - 1];
+        
+        // Convert to Jalali calendar (-1595 offset, 12053 days per 33-year cycle)
         $jy = -1595 + (33 * (int)($days / 12053));
         $days %= 12053;
+        
+        // Refine year calculation (1461 days per 4-year cycle)
         $jy += 4 * (int)($days / 1461);
         $days %= 1461;
         if ($days > 365) {
@@ -90,6 +97,11 @@ class Hamnaghsheh_Email_Notifications
      */
     private function format_price($price)
     {
+        // Handle null or empty prices
+        if (empty($price) || !is_numeric($price)) {
+            return '۰ تومان';
+        }
+        
         $farsi_digits = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
         $english_digits = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
         
@@ -104,6 +116,11 @@ class Hamnaghsheh_Email_Notifications
      */
     private function get_email_template($title, $content, $color = '#2563eb')
     {
+        // Validate color is a hex color code to prevent CSS injection
+        if (!preg_match('/^#[0-9A-Fa-f]{6}$/', $color)) {
+            $color = '#2563eb'; // Default safe color
+        }
+        
         return '
 <!DOCTYPE html>
 <html dir="rtl" lang="fa">
