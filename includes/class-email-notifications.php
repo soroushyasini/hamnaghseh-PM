@@ -45,6 +45,7 @@ class Hamnaghsheh_Email_Notifications
      */
     private function gregorian_to_jalali($gy, $gm, $gd)
     {
+        // Cumulative days in Gregorian months for date conversion
         $g_d_m = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
         $gy2 = ($gm > 2) ? ($gy + 1) : $gy;
         $days = 355666 + (365 * $gy) + (int)(($gy2 + 3) / 4) - (int)(($gy2 + 99) / 100) + (int)(($gy2 + 399) / 400) + $gd + $g_d_m[$gm - 1];
@@ -213,6 +214,11 @@ class Hamnaghsheh_Email_Notifications
         $service = Hamnaghsheh_Services::get_service_by_key($order->service_type);
         $user = get_userdata($order->user_id);
 
+        // Validate that service and user exist
+        if (!$service || !$user) {
+            return null;
+        }
+
         return array(
             'order' => $order,
             'service' => $service,
@@ -242,7 +248,7 @@ class Hamnaghsheh_Email_Notifications
         $site_name = get_bloginfo('name');
         $order_url = esc_url(admin_url('admin.php?page=hamnaghsheh-order-detail&order_id=' . intval($order_id)));
 
-        $subject = sprintf('[%s] 🔔 سفارش جدید - %s', $site_name, $order->order_number);
+        $subject = sprintf('[%s] 🔔 سفارش جدید - %s', $site_name, esc_html($order->order_number));
 
         $content = '
             <p>سلام،</p>
@@ -333,7 +339,7 @@ class Hamnaghsheh_Email_Notifications
         $site_name = get_bloginfo('name');
         $order_url = esc_url(home_url('/order-details/?order_id=' . intval($order_id)));
 
-        $subject = sprintf('[%s] ✅ سفارش شما ثبت شد - %s', $site_name, $order->order_number);
+        $subject = sprintf('[%s] ✅ سفارش شما ثبت شد - %s', $site_name, esc_html($order->order_number));
 
         $content = '
             <p>سلام ' . esc_html($user->display_name) . '،</p>
@@ -396,7 +402,7 @@ class Hamnaghsheh_Email_Notifications
         $site_name = get_bloginfo('name');
         $order_url = esc_url(home_url('/order-details/?order_id=' . intval($order_id)));
 
-        $subject = sprintf('[%s] 💰 قیمت سفارش شما تعیین شد - %s', $site_name, $order->order_number);
+        $subject = sprintf('[%s] 💰 قیمت سفارش شما تعیین شد - %s', $site_name, esc_html($order->order_number));
 
         $content = '
             <p>سلام ' . esc_html($user->display_name) . '،</p>
@@ -460,7 +466,7 @@ class Hamnaghsheh_Email_Notifications
         $site_name = get_bloginfo('name');
         $order_url = esc_url(home_url('/order-details/?order_id=' . intval($order_id)));
 
-        $subject = sprintf('[%s] ✅ پرداخت شما تایید شد - %s', $site_name, $order->order_number);
+        $subject = sprintf('[%s] ✅ پرداخت شما تایید شد - %s', $site_name, esc_html($order->order_number));
 
         $content = '
             <p>سلام ' . esc_html($user->display_name) . '،</p>
@@ -512,10 +518,15 @@ class Hamnaghsheh_Email_Notifications
         $service = $details['service'];
         $user = $details['user'];
 
+        // Validate that project_id exists
+        if (empty($order->project_id)) {
+            return;
+        }
+
         $site_name = get_bloginfo('name');
         $project_url = esc_url(home_url('/project/' . intval($order->project_id)));
 
-        $subject = sprintf('[%s] 🚀 پروژه شما شروع شد - %s', $site_name, $order->order_number);
+        $subject = sprintf('[%s] 🚀 پروژه شما شروع شد - %s', $site_name, esc_html($order->order_number));
 
         $content = '
             <p>سلام ' . esc_html($user->display_name) . '،</p>
@@ -524,15 +535,15 @@ class Hamnaghsheh_Email_Notifications
             <div class="info-box">
                 <div class="info-row">
                     <span class="info-label">شماره سفارش:</span>
-                    <span class="info-value">' . $order->order_number . '</span>
+                    <span class="info-value">' . esc_html($order->order_number) . '</span>
                 </div>
                 <div class="info-row">
                     <span class="info-label">خدمات:</span>
-                    <span class="info-value">' . $service->service_name_fa . '</span>
+                    <span class="info-value">' . esc_html($service->service_name_fa) . '</span>
                 </div>
                 <div class="info-row">
                     <span class="info-label">شناسه پروژه:</span>
-                    <span class="info-value">' . $order->project_id . '</span>
+                    <span class="info-value">' . intval($order->project_id) . '</span>
                 </div>
             </div>
             
@@ -567,10 +578,15 @@ class Hamnaghsheh_Email_Notifications
         $service = $details['service'];
         $user = $details['user'];
 
+        // Validate that project_id exists
+        if (empty($order->project_id)) {
+            return;
+        }
+
         $site_name = get_bloginfo('name');
         $project_url = esc_url(home_url('/project/' . intval($order->project_id)));
 
-        $subject = sprintf('[%s] 🎉 پروژه شما تکمیل شد - %s', $site_name, $order->order_number);
+        $subject = sprintf('[%s] 🎉 پروژه شما تکمیل شد - %s', $site_name, esc_html($order->order_number));
 
         $content = '
             <p>سلام ' . esc_html($user->display_name) . '،</p>
