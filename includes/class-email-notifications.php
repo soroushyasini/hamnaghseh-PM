@@ -240,7 +240,7 @@ class Hamnaghsheh_Email_Notifications
 
         $admin_email = get_option('admin_email');
         $site_name = get_bloginfo('name');
-        $order_url = admin_url('admin.php?page=hamnaghsheh-order-detail&order_id=' . $order_id);
+        $order_url = esc_url(admin_url('admin.php?page=hamnaghsheh-order-detail&order_id=' . intval($order_id)));
 
         $subject = sprintf('[%s] 🔔 سفارش جدید - %s', $site_name, $order->order_number);
 
@@ -255,15 +255,15 @@ class Hamnaghsheh_Email_Notifications
                 </div>
                 <div class="info-row">
                     <span class="info-label">نام مشتری:</span>
-                    <span class="info-value">' . $user->display_name . '</span>
+                    <span class="info-value">' . esc_html($user->display_name) . '</span>
                 </div>
                 <div class="info-row">
                     <span class="info-label">تلفن:</span>
-                    <span class="info-value">' . $order->phone . '</span>
+                    <span class="info-value">' . esc_html($order->phone) . '</span>
                 </div>
                 <div class="info-row">
                     <span class="info-label">ایمیل:</span>
-                    <span class="info-value">' . $user->user_email . '</span>
+                    <span class="info-value">' . esc_html($user->user_email) . '</span>
                 </div>
                 <div class="info-row">
                     <span class="info-label">خدمات:</span>
@@ -331,12 +331,12 @@ class Hamnaghsheh_Email_Notifications
         $user = $details['user'];
 
         $site_name = get_bloginfo('name');
-        $order_url = home_url('/order-details/?order_id=' . $order_id);
+        $order_url = esc_url(home_url('/order-details/?order_id=' . intval($order_id)));
 
         $subject = sprintf('[%s] ✅ سفارش شما ثبت شد - %s', $site_name, $order->order_number);
 
         $content = '
-            <p>سلام ' . $user->display_name . '،</p>
+            <p>سلام ' . esc_html($user->display_name) . '،</p>
             <p>سفارش شما با موفقیت ثبت شد و در حال بررسی توسط تیم ما است.</p>
             
             <div class="info-box">
@@ -394,12 +394,12 @@ class Hamnaghsheh_Email_Notifications
         $user = $details['user'];
 
         $site_name = get_bloginfo('name');
-        $order_url = home_url('/order-details/?order_id=' . $order_id);
+        $order_url = esc_url(home_url('/order-details/?order_id=' . intval($order_id)));
 
         $subject = sprintf('[%s] 💰 قیمت سفارش شما تعیین شد - %s', $site_name, $order->order_number);
 
         $content = '
-            <p>سلام ' . $user->display_name . '،</p>
+            <p>سلام ' . esc_html($user->display_name) . '،</p>
             <p>قیمت نهایی سفارش شما توسط تیم ما تعیین شد:</p>
             
             <div class="info-box">
@@ -458,12 +458,12 @@ class Hamnaghsheh_Email_Notifications
         $user = $details['user'];
 
         $site_name = get_bloginfo('name');
-        $order_url = home_url('/order-details/?order_id=' . $order_id);
+        $order_url = esc_url(home_url('/order-details/?order_id=' . intval($order_id)));
 
         $subject = sprintf('[%s] ✅ پرداخت شما تایید شد - %s', $site_name, $order->order_number);
 
         $content = '
-            <p>سلام ' . $user->display_name . '،</p>
+            <p>سلام ' . esc_html($user->display_name) . '،</p>
             <p>پرداخت شما با موفقیت تایید شد و سفارش شما در صف اجرا قرار گرفت.</p>
             
             <div class="info-box">
@@ -513,12 +513,12 @@ class Hamnaghsheh_Email_Notifications
         $user = $details['user'];
 
         $site_name = get_bloginfo('name');
-        $project_url = home_url('/project/' . $order->project_id);
+        $project_url = esc_url(home_url('/project/' . intval($order->project_id)));
 
         $subject = sprintf('[%s] 🚀 پروژه شما شروع شد - %s', $site_name, $order->order_number);
 
         $content = '
-            <p>سلام ' . $user->display_name . '،</p>
+            <p>سلام ' . esc_html($user->display_name) . '،</p>
             <p>خبر خوب! پروژه شما ایجاد شد و تیم ما شروع به کار کرده است.</p>
             
             <div class="info-box">
@@ -568,12 +568,12 @@ class Hamnaghsheh_Email_Notifications
         $user = $details['user'];
 
         $site_name = get_bloginfo('name');
-        $project_url = home_url('/project/' . $order->project_id);
+        $project_url = esc_url(home_url('/project/' . intval($order->project_id)));
 
         $subject = sprintf('[%s] 🎉 پروژه شما تکمیل شد - %s', $site_name, $order->order_number);
 
         $content = '
-            <p>سلام ' . $user->display_name . '،</p>
+            <p>سلام ' . esc_html($user->display_name) . '،</p>
             <p>با خوشحالی اعلام می‌کنیم که پروژه شما تکمیل شد! 🎉</p>
             
             <div class="info-box">
