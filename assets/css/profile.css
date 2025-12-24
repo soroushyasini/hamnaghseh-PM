@@ -1,0 +1,94 @@
+/* 
+ * Profile Page Styles
+ * Hamnaghsheh PM Plugin
+ * Matches existing design system
+ */
+
+/* Profile page wrapper */
+.hamnaghsheh-profile {
+    font-family: 'Vazirmatn', sans-serif;
+    direction: rtl;
+}
+
+/* Form focus styles */
+.hamnaghsheh-profile input:focus,
+.hamnaghsheh-profile textarea:focus,
+.hamnaghsheh-profile select:focus {
+    outline: none;
+    border-color: #FFCF00;
+    box-shadow: 0 0 0 3px rgba(255, 207, 0, 0.1);
+}
+
+/* Read-only fields */
+.hamnaghsheh-profile input[readonly] {
+    background-color: #f8fafc;
+    cursor: not-allowed;
+}
+
+/* Button hover effects */
+.hamnaghsheh-profile button {
+    transition: all 0.3s ease;
+}
+
+/* Modal backdrop */
+#password-modal {
+    backdrop-filter: blur(4px);
+}
+
+/* Modal animation */
+#password-modal:not(.hidden) {
+    animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .hamnaghsheh-dashboard {
+        padding: 1rem !important;
+    }
+}
+
+/* Storage progress bar animation */
+.hamnaghsheh-profile .bg-\[\#FFCF00\] {
+    transition: width 0.5s ease;
+}
+
+/* Alert messages */
+.hamnaghsheh-profile .border-r-4 {
+    animation: slideInRight 0.3s ease;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Section headers */
+.hamnaghsheh-profile h2 {
+    letter-spacing: -0.01em;
+}
+
+/* Form labels */
+.hamnaghsheh-profile label {
+    font-weight: 500;
+}
+
+/* Disabled button state */
+.hamnaghsheh-profile button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}

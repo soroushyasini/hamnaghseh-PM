@@ -30,6 +30,7 @@ class Hamnaghsheh_Loader
     require_once HAMNAGHSHEH_DIR . 'includes/class-user-setting.php';
     require_once HAMNAGHSHEH_DIR . 'includes/class-pages.php';
     require_once HAMNAGHSHEH_DIR . 'includes/class-minio.php';
+    require_once HAMNAGHSHEH_DIR . 'includes/class-profile.php'; // ✅ NEW: Profile management
     
     // Order management system (simplified version)
     require_once HAMNAGHSHEH_DIR . 'includes/class-services.php';
@@ -75,6 +76,12 @@ class Hamnaghsheh_Loader
   {
     wp_register_style('hamnaghsheh-style', HAMNAGHSHEH_URL . 'assets/css/style.css', array(), HAMNAGHSHEH_VERSION);
     wp_enqueue_style('hamnaghsheh-style');
+
+    // Profile page styles
+    if (is_page('profile')) {
+      wp_register_style('hamnaghsheh-profile', HAMNAGHSHEH_URL . 'assets/css/profile.css', array(), HAMNAGHSHEH_VERSION);
+      wp_enqueue_style('hamnaghsheh-profile');
+    }
 
     // Order management styles
     if (is_page(array('services', 'order-details', 'my-orders', 'order'))) {
