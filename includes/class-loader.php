@@ -35,6 +35,7 @@ class Hamnaghsheh_Loader
     require_once HAMNAGHSHEH_DIR . 'includes/class-services.php';
     require_once HAMNAGHSHEH_DIR . 'includes/class-orders.php';
     require_once HAMNAGHSHEH_DIR . 'includes/class-order-activity.php';
+    require_once HAMNAGHSHEH_DIR . 'includes/class-email-notifications.php';
     // REMOVED in simplified version:  class-order-messages.php
     require_once HAMNAGHSHEH_DIR . 'includes/admin/class-admin-services.php';
     require_once HAMNAGHSHEH_DIR . 'includes/admin/class-admin-orders.php';
@@ -52,6 +53,7 @@ class Hamnaghsheh_Loader
     // Initialize order management system
     new Hamnaghsheh_Services();
     new Hamnaghsheh_Orders();
+    new Hamnaghsheh_Email_Notifications();
     
     // Initialize admin classes if in admin
     if (is_admin()) {
