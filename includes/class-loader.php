@@ -110,29 +110,45 @@ class Hamnaghsheh_Loader
 
   public function tailwind_assets()
   {
-    wp_enqueue_script(
-      'tailwindcdn',
-      'https://cdn.tailwindcss.com',
-      [],
-      null,
-      false
-    );
+    // Check if local Tailwind file exists in shared assets
+    $tailwind_path = WP_CONTENT_DIR . '/shared-assets/js/tailwind.min.js';
+    
+    if (file_exists($tailwind_path)) {
+      // Use local Tailwind file
+      wp_enqueue_script(
+        'tailwindcdn',
+        content_url() . '/shared-assets/js/tailwind.min.js',
+        [],
+        '3.4.17',
+        false
+      );
+    } else {
+      // Fallback to CDN if local file doesn't exist
+      wp_enqueue_script(
+        'tailwindcdn',
+        'https://cdn.tailwindcss.com',
+        [],
+        null,
+        false
+      );
+    }
 
+    // Tailwind custom configuration
     $custom_tailwind = "
-            tailwind.config = {
-              theme: {
-                extend: {
-                  fontFamily: {
-                    sans: ['Vazirmatn', 'ui-sans-serif', 'system-ui']
-                  },
-                  colors: {
-                    primary: '#2563eb',
-                    secondary: '#1e293b'
-                  }
-                }
-              }
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Vazirmatn', 'ui-sans-serif', 'system-ui']
+            },
+            colors: {
+              primary: '#2563eb',
+              secondary: '#1e293b'
             }
-        ";
+          }
+        }
+      }
+    ";
     wp_add_inline_script('tailwindcdn', $custom_tailwind, 'after');
   }
 }
