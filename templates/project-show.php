@@ -50,7 +50,10 @@ function jalaliDate($datetime) {
 <div class="wrap hamnaghsheh-dashboard rounded-2xl p-5 lg:p-10">
   <div class="flex flex-col lg:flex-row gap-6">
 
-    <?php include plugin_dir_path(__FILE__) . 'sidebar-dashboard.php'; ?>
+    <?php 
+    $current_page = 'project';
+    include HAMNAGHSHEH_DIR . 'templates/parts/user-sidebar.php'; 
+    ?>
 
     <main class="flex-1">
 
