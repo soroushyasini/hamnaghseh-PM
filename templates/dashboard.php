@@ -34,6 +34,9 @@ $percent = $total_space > 0 ? min(100, round(($used_space / $total_space) * 100)
 $used_human = size_format($used_space);
 $total_human = size_format($total_space);
 
+// Get archived projects
+$archived_project = Hamnaghsheh_Projects::get_archived_project($current_user->ID);
+
 ?>
 
 <div class="wrap hamnaghsheh-dashboard rounded-2xl p-5 lg:p-10">
