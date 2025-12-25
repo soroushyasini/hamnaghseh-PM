@@ -22,6 +22,7 @@
  * @var bool    $role               - Whether to show project-specific sections
  * @var array   $members            - Array of project members (when $role is true)
  * @var bool    $can_manage         - Whether current user can manage project members
+ * @var object  $project            - Project object (required when $can_manage is true, for member removal)
  * 
  * @package Hamnaghsheh
  * @since 1.1.7
