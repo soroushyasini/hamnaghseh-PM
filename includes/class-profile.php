@@ -116,6 +116,13 @@ class Hamnaghsheh_Profile
         $storage_used_human = size_format($storage_used);
         $storage_limit_human = size_format($storage_limit);
 
+        // Set variables for sidebar compatibility
+        $total_space = $storage_limit;
+        $used_space = $storage_used;
+        $percent = $storage_percent;
+        $used_human = $storage_used_human;
+        $total_human = $storage_limit_human;
+
         // Get access level label
         $access_label = Hamnaghsheh_Utils::get_access_level_label($access_level);
 

@@ -16,7 +16,10 @@ $is_admin = current_user_can('manage_options');
 <div class="wrap hamnaghsheh-dashboard rounded-2xl p-5 lg:p-10">
   <div class="flex flex-col lg:flex-row gap-6">
 
-    <?php include plugin_dir_path(__FILE__) . 'sidebar-dashboard.php'; ?>
+    <?php 
+    $current_page = 'dashboard';
+    include HAMNAGHSHEH_DIR . 'templates/parts/user-sidebar.php'; 
+    ?>
 
     <main class="flex-1">
       <div class="mb-5 xl:mb-8 flex items-center justify-between">
