@@ -31,6 +31,19 @@
 if (!defined('ABSPATH'))
     exit;
 
+// Validate required variables
+if (!isset($current_user) || !isset($projects) || !isset($access_level) || !isset($access_label)) {
+    error_log('user-sidebar.php: Missing required variables. Required: $current_user, $projects, $access_level, $access_label');
+    return;
+}
+
+// Set defaults for optional variables if not provided
+if (!isset($total_space)) $total_space = 0;
+if (!isset($used_space)) $used_space = 0;
+if (!isset($percent)) $percent = 0;
+if (!isset($used_human)) $used_human = '0 B';
+if (!isset($total_human)) $total_human = '0 B';
+
 ?>
 
 <aside class="w-full lg:w-56 bg-[#09375B] rounded-2xl p-4 flex flex-col items-center text-center text-white shadow-lg self-start">
