@@ -56,7 +56,7 @@ class Hamnaghsheh_File_Security
         $basename = $path_info['filename'];
         
         // Remove dangerous characters but preserve Persian
-        $basename = preg_replace('/[^\p{L}\p{N}\s\-_\.]/u', '', $basename);
+        $basename = preg_replace('/[^\p{L}\p{N}\s\-_]/u', '', $basename);
         
         // Remove multiple spaces/dashes
         $basename = preg_replace('/[\s\-_]+/', '-', $basename);
@@ -94,8 +94,22 @@ class Hamnaghsheh_File_Security
         
         // Get actual MIME type
         $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        if ($finfo === false) {
+            return [
+                'valid' => false,
+                'message' => '⚠️ خطا در بررسی نوع فایل. لطفاً با مدیر تماس بگیرید.'
+            ];
+        }
+        
         $mime = finfo_file($finfo, $file_path);
         finfo_close($finfo);
+        
+        if ($mime === false) {
+            return [
+                'valid' => false,
+                'message' => '⚠️ خطا در تشخیص نوع فایل.'
+            ];
+        }
         
         $allowed_mimes = self::MIME_TYPES[$extension];
         
@@ -185,12 +199,19 @@ class Hamnaghsheh_File_Security
      */
     public static function scan_kml_external_refs($file_path)
     {
-        $content = file_get_contents($file_path, false, null, 0, 8192); // Read first 8KB
+        $content = @file_get_contents($file_path, false, null, 0, 8192); // Read first 8KB
         
         if ($content === false) {
             return [
                 'valid' => false,
                 'message' => '⚠️ خطا در خواندن فایل KML.'
+            ];
+        }
+        
+        if (empty($content)) {
+            return [
+                'valid' => false,
+                'message' => '⚠️ فایل KML خالی است.'
             ];
         }
         
@@ -221,7 +242,7 @@ class Hamnaghsheh_File_Security
      */
     public static function validate_dbf_header($file_path)
     {
-        $handle = fopen($file_path, 'rb');
+        $handle = @fopen($file_path, 'rb');
         if (!$handle) {
             return [
                 'valid' => false,
@@ -230,8 +251,16 @@ class Hamnaghsheh_File_Security
         }
         
         // Read first byte - should be DBF version marker
-        $version = ord(fread($handle, 1));
+        $data = fread($handle, 1);
+        $version = $data !== false ? ord($data) : 0;
         fclose($handle);
+        
+        if ($data === false) {
+            return [
+                'valid' => false,
+                'message' => '⚠️ خطا در خواندن هدر فایل DBF.'
+            ];
+        }
         
         // Valid DBF version markers: 0x02, 0x03, 0x04, 0x05, 0x30, 0x31, 0x83, 0x8B, 0x8E, 0xF5
         $valid_versions = [0x02, 0x03, 0x04, 0x05, 0x30, 0x31, 0x83, 0x8B, 0x8E, 0xF5];

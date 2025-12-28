@@ -188,7 +188,7 @@ class Hamnaghsheh_Utils
                 'storage' => 104857600, // 100 MB
                 'storage_label' => '100 مگابایت',
                 'formats' => ['dwg', 'dxf', 'txt', 'kml', 'kmz', 'shp', 'gpx', 'geojson', 'zip'],
-                'formats_label' => 'DWG, DXF, TXT, KML, KMZ, SHP, GPX, GeoJSON, ZIP',
+                'formats_label' => 'فرمتهای CAD و GIS (DWG, DXF, KML, SHP, GPX و...)',
                 'share_limit' => 100,
                 'can_upload' => true,
                 'can_delete' => true,
