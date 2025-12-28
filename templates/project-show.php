@@ -221,9 +221,12 @@ function jalaliDate($datetime) {
         
                     <?php 
                     $ext = strtolower(pathinfo($f['file_path'], PATHINFO_EXTENSION));
-                    $txt_url = 'https://hamnaghsheh.ir/txt-viewer/?file=' . urlencode($f['file_path']);
-                    $cad_url = 'https://hamnaghsheh.ir/dwg-viewer/?file=' . urlencode($f['file_path']);
-                    $gis_url = 'https://hamnaghsheh.ir/gis-viewer/?file=' . urlencode($f['file_path']) . '&type=' . urlencode($ext);
+                    $txt_url = add_query_arg('file', $f['file_path'], 'https://hamnaghsheh.ir/txt-viewer/');
+                    $cad_url = add_query_arg('file', $f['file_path'], 'https://hamnaghsheh.ir/dwg-viewer/');
+                    $gis_url = add_query_arg(
+                        array('file' => $f['file_path'], 'type' => $ext),
+                        'https://hamnaghsheh.ir/gis-viewer/'
+                    );
                     
                     // Determine viewer type and button label
                     $viewer_url = null;

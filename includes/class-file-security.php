@@ -58,8 +58,11 @@ class Hamnaghsheh_File_Security
         // Remove dangerous characters but preserve Persian
         $basename = preg_replace('/[^\p{L}\p{N}\s\-_]/u', '', $basename);
         
-        // Remove multiple spaces/dashes
-        $basename = preg_replace('/[\s\-_]+/', '-', $basename);
+        // Remove multiple spaces
+        $basename = preg_replace('/\s+/', '-', $basename);
+        
+        // Consolidate multiple dashes and underscores
+        $basename = preg_replace('/[-_]+/', '-', $basename);
         
         // Trim dashes from edges
         $basename = trim($basename, '-_.');
@@ -199,7 +202,7 @@ class Hamnaghsheh_File_Security
      */
     public static function scan_kml_external_refs($file_path)
     {
-        $content = @file_get_contents($file_path, false, null, 0, 8192); // Read first 8KB
+        $content = file_get_contents($file_path, false, null, 0, 8192); // Read first 8KB
         
         if ($content === false) {
             return [
@@ -242,7 +245,7 @@ class Hamnaghsheh_File_Security
      */
     public static function validate_dbf_header($file_path)
     {
-        $handle = @fopen($file_path, 'rb');
+        $handle = fopen($file_path, 'rb');
         if (!$handle) {
             return [
                 'valid' => false,
