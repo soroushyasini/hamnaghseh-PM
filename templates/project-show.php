@@ -228,7 +228,6 @@ function jalaliDate($datetime) {
                         'https://hamnaghsheh.ir/gis-viewer/'
                     );
                     
-                    
                     $viewer_url = null;
                     $viewer_label = 'مشاهده';
                     
@@ -247,36 +246,6 @@ function jalaliDate($datetime) {
                         );
                         $viewer_url = $doc_url;
                     }
-                                        // Determine viewer type and button label
-                    // $viewer_url = null;
-                    // $viewer_label = 'مشاهده';
-                    
-                    // if ($ext === 'txt') {
-                    //     $viewer_url = $txt_url;
-                    //     $viewer_label = 'مشاهده متن';
-                    // } elseif ($ext === 'dwg' || $ext === 'dxf') {
-                    //     $viewer_url = $cad_url;
-                    //     $viewer_label = 'مشاهده CAD';
-                    // } elseif (in_array($ext, ['kml', 'kmz', 'geojson', 'gpx'])) {
-                    //     $viewer_url = $gis_url;
-                    //     $viewer_label = 'مشاهده نقشه';
-                    // } elseif ($ext === 'shp') {
-                    //     $viewer_url = $gis_url;
-                    //     $viewer_label = 'مشاهده Shapefile';
-                    // } elseif (in_array($ext, ['pdf', 'png', 'jpg', 'jpeg'])) {
-                    //     $doc_url = add_query_arg(
-                    //         array('file' => $f['file_path'], 'type' => $ext),
-                    //         'https://hamnaghsheh.ir/document-viewer/'
-                    //     );
-                        
-                    //     if ($ext === 'pdf') {
-                    //         $viewer_url = $doc_url;
-                    //         $viewer_label = 'مشاهده PDF';
-                    //     } else {
-                    //         $viewer_url = $doc_url;
-                    //         $viewer_label = 'مشاهده تصویر';
-                    //     }
-                    // }
                     
                     if ($viewer_url): ?>
                         <a target="_blank" href="<?php echo esc_url($viewer_url); ?>" 
