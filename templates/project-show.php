@@ -244,6 +244,19 @@ function jalaliDate($datetime) {
                     } elseif ($ext === 'shp') {
                         $viewer_url = $gis_url;
                         $viewer_label = 'مشاهده Shapefile';
+                    } elseif (in_array($ext, ['pdf', 'png', 'jpg', 'jpeg'])) {
+                        $doc_url = add_query_arg(
+                            array('file' => $f['file_path'], 'type' => $ext),
+                            'https://hamnaghsheh.ir/document-viewer/'
+                        );
+                        
+                        if ($ext === 'pdf') {
+                            $viewer_url = $doc_url;
+                            $viewer_label = 'مشاهده PDF';
+                        } else {
+                            $viewer_url = $doc_url;
+                            $viewer_label = 'مشاهده تصویر';
+                        }
                     }
                     
                     if ($viewer_url): ?>

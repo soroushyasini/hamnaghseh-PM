@@ -1,5 +1,27 @@
 # Changelog - Order Management System Simplification
 
+## [1.3.0] - 2025-12-29
+
+### Added
+- 📄 Document Viewer support for PDF files (Enterprise tier)
+- 🖼️ Image Viewer support for PNG, JPG, JPEG files (Enterprise tier)
+- 📱 Mobile-optimized viewers with touch gestures (pinch-to-zoom, swipe)
+- 🎨 Custom branded UI matching Hamnaghseh theme colors
+- 📚 Comprehensive documentation in `docs/DOCUMENT_IMAGE_VIEWER_SUPPORT.md`
+
+### Changed
+- Updated `templates/project-show.php` to display viewer buttons for documents/images
+- Enhanced README.md with document format support information
+
+### Technical Details
+- PDF viewer built with PDF.js (Mozilla) - ~500KB
+- Image viewer built with Viewer.js - ~50KB
+- Fully responsive and RTL-compatible
+- Persian UI throughout
+- Touch-optimized for mobile field workers
+- Enterprise tier exclusive feature
+- Max file size: 500 MB for documents/images
+
 ## Version 3.1 - Simplified Order System (Current)
 
 ### Overview
