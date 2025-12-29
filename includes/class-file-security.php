@@ -36,7 +36,8 @@ class Hamnaghsheh_File_Security
         
         // Documents
         'txt' => ['text/plain'],
-        'pdf' => ['application/pdf'],
+        // PDF: Multiple MIME types to support different PDF generators and server configurations
+        'pdf' => ['application/pdf', 'application/x-pdf', 'application/acrobat', 'application/vnd.pdf', 'text/pdf', 'text/x-pdf', 'application/octet-stream'],
         'png' => ['image/png'],
         'jpg' => ['image/jpeg'],
         'jpeg' => ['image/jpeg'],
