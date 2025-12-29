@@ -74,7 +74,7 @@ $is_admin = current_user_can('manage_options');
                   <div class="relative lg:absolute lg:left-5 lg:top-5 p-2 lg:p-0">
                     <div class="flex gap-2 flex-row-reverse items-center justify-start">
                       <?php if ($p->is_owner): ?>
-                        <button style="color:white;" 
+                        <button
                           onclick="openEditModal(
                             '<?php echo esc_js($p->id); ?>', 
                             '<?php echo esc_js($p->name); ?>', 
