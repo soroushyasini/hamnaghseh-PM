@@ -105,6 +105,14 @@ The plugin now supports comprehensive GIS file formats for modern survey operati
 | **GeoJSON** | `.geojson` | Geographic JSON | ✅ GIS Viewer |
 | **ZIP** | `.zip` | Archive for shapefiles | N/A |
 
+### Document Formats (Enterprise Only)
+
+| Format | Extensions | Description | Viewer |
+|--------|-----------|-------------|---------|
+| **PDF** | `.pdf` | Portable Document Format | ✅ Document Viewer |
+| **PNG** | `.png` | Portable Network Graphics | ✅ Image Viewer |
+| **JPG** | `.jpg`, `.jpeg` | JPEG images | ✅ Image Viewer |
+
 ### Key Features
 
 - 🔒 **6-layer security validation** (ZIP bomb, XXE, MIME type checks)
@@ -112,6 +120,8 @@ The plugin now supports comprehensive GIS file formats for modern survey operati
 - 📏 **Configurable file size limits** per tier and format
 - 🛡️ **Advanced threat protection** (compression bombs, malicious XML)
 - 🌐 **Integrated viewer** routes to GIS viewer automatically
+- 📄 **Document/Image viewer** for PDF, PNG, JPG, JPEG (Enterprise tier)
+- 📱 **Mobile-optimized** with touch gestures and responsive UI
 - 🔤 **Persian-safe filename sanitization**
 
 ### File Size Limits
