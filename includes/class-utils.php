@@ -187,8 +187,8 @@ class Hamnaghsheh_Utils
                 'price' => '1,000,000 تومان/سال',
                 'storage' => 104857600, // 100 MB
                 'storage_label' => '100 مگابایت',
-                'formats' => ['dwg', 'dxf', 'txt'],
-                'formats_label' => 'DWG, DXF, TXT',
+                'formats' => ['dwg', 'dxf', 'txt', 'kml', 'kmz', 'shp', 'gpx', 'geojson', 'zip'],
+                'formats_label' => 'فرمتهای CAD و GIS (DWG, DXF, KML, SHP, GPX و...)',
                 'share_limit' => 100,
                 'can_upload' => true,
                 'can_delete' => true,
@@ -210,8 +210,8 @@ class Hamnaghsheh_Utils
                 'price' => '5,000,000 تومان/سال',
                 'storage' => 1073741824, // 1 GB
                 'storage_label' => '1 گیگابایت',
-                'formats' => ['dwg', 'dxf', 'txt', 'pdf', 'png', 'jpg', 'jpeg'],
-                'formats_label' => 'DWG, DXF, TXT, PDF, PNG, JPG',
+                'formats' => ['dwg', 'dxf', 'txt', 'kml', 'kmz', 'shp', 'gpx', 'geojson', 'zip', 'pdf', 'png', 'jpg', 'jpeg'],
+                'formats_label' => 'همه فرمتهای CAD و GIS + PDF, PNG, JPG',
                 'share_limit' => -1, // Unlimited
                 'can_upload' => true,
                 'can_delete' => true,

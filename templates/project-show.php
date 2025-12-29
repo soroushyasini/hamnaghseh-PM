@@ -221,22 +221,38 @@ function jalaliDate($datetime) {
         
                     <?php 
                     $ext = strtolower(pathinfo($f['file_path'], PATHINFO_EXTENSION));
-                    $txt_url = 'https://hamnaghsheh.ir/txt-viewer/?file=' . $f['file_path'];
-                    $cad_url = 'https://hamnaghsheh.ir/dwg-viewer/?file=' . $f['file_path'];
+                    $txt_url = add_query_arg('file', $f['file_path'], 'https://hamnaghsheh.ir/txt-viewer/');
+                    $cad_url = add_query_arg('file', $f['file_path'], 'https://hamnaghsheh.ir/dwg-viewer/');
+                    $gis_url = add_query_arg(
+                        array('file' => $f['file_path'], 'type' => $ext),
+                        'https://hamnaghsheh.ir/gis-viewer/'
+                    );
+                    
+                    // Determine viewer type and button label
+                    $viewer_url = null;
+                    $viewer_label = 'مشاهده';
+                    
                     if ($ext === 'txt') {
-                        $final_url = $txt_url;
-                        ?>
-                        <a target="_blank" href="<?php echo $final_url; ?>" class="bg-slate-800 hover:bg-slate-900 text-white px-3 py-1 rounded-lg text-xs font-semibold transition flex items-center justify-center"  onclick="logSee(<?php echo intval($f['id']); ?>, <?php echo intval($project->id); ?>)">مشاهده</a>
-                        <?php
+                        $viewer_url = $txt_url;
+                        $viewer_label = 'مشاهده متن';
                     } elseif ($ext === 'dwg' || $ext === 'dxf') {
-                        $final_url = $cad_url;
-                        ?>
-                         <a target="_blank" href="<?php echo $final_url; ?>" class="bg-slate-800 hover:bg-slate-900 text-white px-3 py-1 rounded-lg text-xs font-semibold transition flex items-center justify-center"  onclick="logSee(<?php echo intval($f['id']); ?>, <?php echo intval($project->id); ?>)">مشاهده</a>
-                    <?php
-                    } else {
-                        $final_url = null;
+                        $viewer_url = $cad_url;
+                        $viewer_label = 'مشاهده CAD';
+                    } elseif (in_array($ext, ['kml', 'kmz', 'geojson', 'gpx'])) {
+                        $viewer_url = $gis_url;
+                        $viewer_label = 'مشاهده نقشه';
+                    } elseif ($ext === 'shp') {
+                        $viewer_url = $gis_url;
+                        $viewer_label = 'مشاهده Shapefile';
                     }
-                    ?>
+                    
+                    if ($viewer_url): ?>
+                        <a target="_blank" href="<?php echo esc_url($viewer_url); ?>" 
+                           class="bg-slate-800 hover:bg-slate-900 text-white px-3 py-1 rounded-lg text-xs font-semibold transition flex items-center justify-center"  
+                           onclick="logSee(<?php echo intval($f['id']); ?>, <?php echo intval($project->id); ?>)">
+                            <?php echo esc_html($viewer_label); ?>
+                        </a>
+                    <?php endif; ?>
                     
                     <?php if ($can_manage): ?>
                       <button onclick="openFileLogsModal(<?php echo $f['id']; ?>)"

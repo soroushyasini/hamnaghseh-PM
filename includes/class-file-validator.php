@@ -29,8 +29,21 @@ class Hamnaghsheh_File_Validator
         
         $extensions = [
             'free' => [], // Free users without trial cannot upload
-            'premium' => ['dwg', 'dxf', 'txt'],
-            'enterprise' => ['dwg', 'dxf', 'txt', 'pdf', 'png', 'jpg', 'jpeg']
+            'premium' => [
+                // CAD formats
+                'dwg', 'dxf', 'txt',
+                // GIS formats
+                'kml', 'kmz', 'shp', 'shx', 'dbf', 'prj', 'gpx', 'geojson', 'zip'
+            ],
+            'enterprise' => [
+                // CAD formats
+                'dwg', 'dxf', 'txt',
+                // GIS formats
+                'kml', 'kmz', 'shp', 'shx', 'dbf', 'prj', 'cpg', 'sbn', 'sbx',
+                'gpx', 'geojson', 'zip',
+                // Document formats
+                'pdf', 'png', 'jpg', 'jpeg'
+            ]
         ];
 
         return isset($extensions[$access_level]) ? $extensions[$access_level] : [];
@@ -265,5 +278,81 @@ class Hamnaghsheh_File_Validator
         }
 
         return '⚠️ این امکان برای شما محدود است. برای ارتقا با مدیر تماس بگیرید.';
+    }
+
+    /**
+     * Comprehensive file validation with security checks
+     * Created by soroush - 28/12/2025
+     * 
+     * @param array $file $_FILES array element
+     * @param int|null $user_id User ID
+     * @return array ['valid' => bool, 'message' => string]
+     */
+    public static function validate_file_comprehensive($file, $user_id = null)
+    {
+        if ($user_id === null) {
+            $user_id = get_current_user_id();
+        }
+
+        // 1. Check if user can upload
+        $can_upload = self::can_user_upload($user_id);
+        if (!$can_upload['can_upload']) {
+            return ['valid' => false, 'message' => $can_upload['message']];
+        }
+
+        // 2. Validate file type
+        $type_check = self::validate_file_type($file['name'], $user_id);
+        if (!$type_check['valid']) {
+            return ['valid' => false, 'message' => $type_check['message']];
+        }
+
+        $file_ext = $type_check['extension'];
+        $access_level = Hamnaghsheh_Users::get_user_access_level($user_id);
+
+        // 3. Validate file size
+        $size_check = Hamnaghsheh_File_Security::validate_file_size(
+            $file['size'],
+            $access_level,
+            $file_ext
+        );
+        if (!$size_check['valid']) {
+            return ['valid' => false, 'message' => $size_check['message']];
+        }
+
+        // 4. Validate MIME type
+        $mime_check = Hamnaghsheh_File_Security::validate_mime_type(
+            $file['tmp_name'],
+            $file_ext
+        );
+        if (!$mime_check['valid']) {
+            return ['valid' => false, 'message' => $mime_check['message']];
+        }
+
+        // 5. Format-specific security checks
+        if (in_array($file_ext, ['zip', 'kmz'])) {
+            // Check for ZIP bombs
+            $zip_check = Hamnaghsheh_File_Security::check_zip_bomb($file['tmp_name']);
+            if (!$zip_check['valid']) {
+                return ['valid' => false, 'message' => $zip_check['message']];
+            }
+        }
+
+        if ($file_ext === 'kml') {
+            // Check for external references (XXE)
+            $kml_check = Hamnaghsheh_File_Security::scan_kml_external_refs($file['tmp_name']);
+            if (!$kml_check['valid']) {
+                return ['valid' => false, 'message' => $kml_check['message']];
+            }
+        }
+
+        if ($file_ext === 'dbf') {
+            // Validate DBF header
+            $dbf_check = Hamnaghsheh_File_Security::validate_dbf_header($file['tmp_name']);
+            if (!$dbf_check['valid']) {
+                return ['valid' => false, 'message' => $dbf_check['message']];
+            }
+        }
+
+        return ['valid' => true, 'message' => ''];
     }
 }

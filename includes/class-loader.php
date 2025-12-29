@@ -20,6 +20,8 @@ class Hamnaghsheh_Loader
     require_once HAMNAGHSHEH_DIR . 'includes/class-project-show.php';
     require_once HAMNAGHSHEH_DIR . 'includes/class-projects.php';
     require_once HAMNAGHSHEH_DIR . 'includes/class-utils.php';
+    require_once HAMNAGHSHEH_DIR . 'includes/class-file-limits.php';
+    require_once HAMNAGHSHEH_DIR . 'includes/class-file-security.php';
     require_once HAMNAGHSHEH_DIR . 'includes/class-file-validator.php';
     require_once HAMNAGHSHEH_DIR . 'includes/class-trial-manager.php';
     require_once HAMNAGHSHEH_DIR . 'includes/class-upload-file.php';

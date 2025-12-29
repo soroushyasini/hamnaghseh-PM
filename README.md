@@ -77,15 +77,69 @@ phone-based negotiation instead of complex in-app messaging and quote systems.
 
 ### Project Management
 - ✅ File upload/download (DWG, DXF, TXT)
+- ✅ **NEW: GIS file format support** (KML, KMZ, Shapefile, GPX, GeoJSON)
+- ✅ **Multi-file shapefile handling** (SHP, SHX, DBF, PRJ)
 - ✅ Project sharing with guest links
 - ✅ Access control (view/download permissions)
 - ✅ File version tracking
 - ✅ Storage management
+- ✅ **Integrated GIS viewer** for map visualization
 
 ### Services
 - 📋 نقشه برداری نیم روزه (Half-day surveying)
 - 📋 نقشه برداری تمام روزه (Full-day surveying)
 - ⚙️ Customizable pricing per service
+
+## 🗺️ GIS File Format Support (NEW in v1.2.0)
+
+The plugin now supports comprehensive GIS file formats for modern survey operations:
+
+### Supported Formats
+
+| Format | Extensions | Description | Viewer |
+|--------|-----------|-------------|---------|
+| **KML** | `.kml` | Google Earth format | ✅ GIS Viewer |
+| **KMZ** | `.kmz` | Compressed KML | ✅ GIS Viewer |
+| **Shapefile** | `.shp`, `.shx`, `.dbf`, `.prj` | ESRI Shapefile | ✅ GIS Viewer |
+| **GPX** | `.gpx` | GPS tracks | ✅ GIS Viewer |
+| **GeoJSON** | `.geojson` | Geographic JSON | ✅ GIS Viewer |
+| **ZIP** | `.zip` | Archive for shapefiles | N/A |
+
+### Key Features
+
+- 🔒 **6-layer security validation** (ZIP bomb, XXE, MIME type checks)
+- 📦 **Multi-file shapefile support** (upload all components)
+- 📏 **Configurable file size limits** per tier and format
+- 🛡️ **Advanced threat protection** (compression bombs, malicious XML)
+- 🌐 **Integrated viewer** routes to GIS viewer automatically
+- 🔤 **Persian-safe filename sanitization**
+
+### File Size Limits
+
+**Premium Tier:**
+- Default: 50 MB per file
+- KML/KMZ: 100 MB
+- Shapefile: 500 MB
+- GPX: 50 MB
+- GeoJSON: 100 MB
+
+**Enterprise Tier:**
+- Default: 500 MB per file
+- Format-specific limits apply
+- Additional shapefile components supported
+
+### Security Highlights
+
+✅ ZIP bomb detection (100:1 compression ratio limit)  
+✅ XXE vulnerability scanning for KML/GPX files  
+✅ MIME type validation (checks actual file content)  
+✅ DBF header validation for shapefiles  
+✅ Filename sanitization (preserves Persian characters)  
+✅ Storage quota enforcement
+
+📚 **For detailed documentation, see:**
+- [GIS File Support Guide](docs/GIS_FILE_SUPPORT.md)
+- [Security Best Practices](docs/SECURITY_BEST_PRACTICES.md)
 
 ## Installation
 

@@ -70,16 +70,8 @@ class Hamnaghsheh_File_Upload
             exit;
         }
 
-        // ✅ NEW: Check if user can upload based on access level -  added by soroush - 4 Dec 2025
-        $can_upload = Hamnaghsheh_File_Validator::can_user_upload($user_id);
-        if (!$can_upload['can_upload']) {
-            $_SESSION['alert'] = ['type' => 'error', 'message' => $can_upload['message']];
-            wp_redirect(home_url('/show-project/?id=' . $project_id));
-            exit;
-        }
-
-        // ✅ NEW: Validate file type based on user's access level   -  added by soroush - 4 Dec 2025
-        $file_validation = Hamnaghsheh_File_Validator::validate_file_type($file['name'], $user_id);
+        // ✅ NEW: Comprehensive file validation with security checks - added by soroush - 28/12/2025
+        $file_validation = Hamnaghsheh_File_Validator::validate_file_comprehensive($file, $user_id);
         if (!$file_validation['valid']) {
             $_SESSION['alert'] = ['type' => 'error', 'message' => $file_validation['message']];
             wp_redirect(home_url('/show-project/?id=' . $project_id));
@@ -110,8 +102,8 @@ class Hamnaghsheh_File_Upload
             exit;
         }
 
-        // ✅ Save file record
-        $file_name = sanitize_file_name($file['name']);
+        // ✅ Save file record with sanitized filename - updated by soroush - 28/12/2025
+        $file_name = Hamnaghsheh_File_Security::sanitize_filename($file['name']);
         $wpdb->insert($table_files, [
             'project_id' => $project_id,
             'user_id' => $user_id,
@@ -264,8 +256,8 @@ class Hamnaghsheh_File_Upload
             exit;
         }
 
-        // ✅ NEW: Validate file type based on user's access level
-        $file_validation = Hamnaghsheh_File_Validator::validate_file_type($file['name'], $user_id);
+        // ✅ NEW: Comprehensive file validation - updated by soroush - 28/12/2025
+        $file_validation = Hamnaghsheh_File_Validator::validate_file_comprehensive($file, $user_id);
         if (!$file_validation['valid']) {
             $_SESSION['alert'] = ['type' => 'error', 'message' => $file_validation['message']];
             wp_redirect(home_url('/show-project/?id=' . $project_id));
@@ -297,8 +289,8 @@ class Hamnaghsheh_File_Upload
             exit;
         }
         
-        // ✅ Update database record
-        $file_name = sanitize_file_name($file['name']);
+        // ✅ Update database record with sanitized filename - updated by soroush - 28/12/2025
+        $file_name = Hamnaghsheh_File_Security::sanitize_filename($file['name']);
         $wpdb->update(
             $table_files,
             [
