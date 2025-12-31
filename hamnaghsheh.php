@@ -44,6 +44,7 @@ add_action('admin_enqueue_scripts', array($hamnaghsheh_loader, 'admin_assets'));
 add_shortcode('hamnaghsheh_dashboard', array('Hamnaghsheh_Dashboard', 'render_shortcode'));
 add_shortcode('hamnaghsheh_new-project', array('Hamnaghsheh_New_Project', 'render_shortcode'));
 add_shortcode('hamnaghsheh_project_show', array('Hamnaghsheh_Project_Show', 'render_shortcode'));
+add_shortcode('hamnaghsheh_profile', array('Hamnaghsheh_Profile', 'render_shortcode')); // ✅ NEW: Profile page
 
 /**
  * AJAX endpoints (both for logged-in and guest when needed)
@@ -52,6 +53,10 @@ add_action('wp_ajax_hamnaghsheh_create_project', array('Hamnaghsheh_Projects', '
 add_action('wp_ajax_hamnaghsheh_upload_file', array('Hamnaghsheh_Files', 'ajax_upload_file'));
 add_action('wp_ajax_hamnaghsheh_delete_file', array('Hamnaghsheh_Files', 'ajax_delete_file'));
 add_action('wp_ajax_nopriv_hamnaghsheh_guest_view', array('Hamnaghsheh_Share_Links', 'guest_view'));
+
+// ✅ NEW: Profile management AJAX actions
+add_action('wp_ajax_hamnaghsheh_update_profile', array('Hamnaghsheh_Profile', 'ajax_update_profile'));
+add_action('wp_ajax_hamnaghsheh_change_password', array('Hamnaghsheh_Profile', 'ajax_change_password'));
 
 add_action('plugins_loaded', function () {
     new Hamnaghsheh_Projects();
@@ -111,6 +116,12 @@ add_action('template_redirect', function () {
 add_action('template_redirect', function () {
     if (is_page('dashboard') && !is_user_logged_in()) {
         wp_redirect(site_url('/auth?redirect_to=' . urlencode(site_url('/dashboard'))));
+        exit;
+    }
+    
+    // ✅ NEW: Profile page protection
+    if (is_page('profile') && !is_user_logged_in()) {
+        wp_redirect(site_url('/auth?redirect_to=' . urlencode(site_url('/profile'))));
         exit;
     }
     
