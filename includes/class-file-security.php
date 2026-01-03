@@ -38,8 +38,9 @@ class Hamnaghsheh_File_Security
         'txt' => ['text/plain'],
         // PDF: Multiple MIME types to support different PDF generators and server configurations
         'pdf' => ['application/pdf', 'application/x-pdf', 'application/acrobat', 'application/vnd.pdf', 'text/pdf', 'text/x-pdf', 'application/octet-stream'],
-        // FIXED - Multiple MIME types ✅
+        // PNG formats - support various image editors and systems
         'png' => ['image/png', 'image/x-png', 'image/vnd.mozilla.apng', 'application/octet-stream'],
+        // JPEG formats - support cameras, phones, and progressive JPEGs
         'jpg' => ['image/jpeg', 'image/pjpeg', 'image/jpg', 'application/octet-stream'],
         'jpeg' => ['image/jpeg', 'image/pjpeg', 'image/jpg', 'application/octet-stream'],
     ];
