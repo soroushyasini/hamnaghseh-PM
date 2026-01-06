@@ -363,7 +363,7 @@ class Hamnaghsheh_File_Upload
         $table = $wpdb->prefix . 'hamnaghsheh_files';
         
         return $wpdb->get_results($wpdb->prepare(
-            "SELECT id, file_name, file_size FROM {$table} 
+            "SELECT id, file_name, file_size, uploaded_at FROM {$table} 
              WHERE project_id = %d 
              ORDER BY uploaded_at DESC",
             $project_id
