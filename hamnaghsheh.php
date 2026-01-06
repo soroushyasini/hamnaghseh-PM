@@ -3,7 +3,7 @@
  * Plugin Name: Hamnaghsheh  -  Projects Manager + survey services
  * Plugin URI:  https://hamnaghsheh.ir
  * Description: مدیریت پروژه‌ها و فایل‌ها برای کاربران؛ آپلود DWG/DXF/TXT و اشتراک با لینک مهمان.
- * Version:     1.1.7
+ * Version:     1.2.0
  * Author:      Milad Karimi - soroush yasini
  * Text Domain: hamnaghsheh
  */
@@ -12,7 +12,8 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('HAMNAGHSHEH_VERSION', '0.2.7');
+// Version constant - keep in sync with plugin header
+define('HAMNAGHSHEH_VERSION', '1.2.0');
 define('HAMNAGHSHEH_DIR', plugin_dir_path(__FILE__));
 define('HAMNAGHSHEH_URL', plugin_dir_url(__FILE__));
 define('HAMNAGHSHEH_PREFIX', 'hamnaghsheh_');
