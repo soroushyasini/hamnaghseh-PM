@@ -327,6 +327,16 @@ function jalaliDate($datetime) {
       </div>
 
     </main>
+    
+    <?php 
+    /**
+     * Hook for chat plugin to inject UI
+     * @since 1.2.0
+     * @param int $project_id
+     * @param object $project Full project object
+     */
+    do_action('hamnaghsheh_chat_render', $project->id, $project); 
+    ?>
 
   </div>
 </div>

@@ -129,6 +129,9 @@ class Hamnaghsheh_File_Upload
             ['%d', '%d', '%d', '%s']
         );
 
+        // ✅ Fire hook for chat plugin
+        do_action('hamnaghsheh_file_action', $file_id, $project_id, $user_id, 'upload');
+
         $_SESSION['alert'] = ['type' => 'success', 'message' => '✅ فایل با موفقیت آپلود شد.'];
         wp_redirect(home_url('/show-project/?id=' . $project_id));
         exit;
@@ -191,6 +194,9 @@ class Hamnaghsheh_File_Upload
             ],
             ['%d', '%d', '%d', '%s']
         );
+
+        // ✅ Fire hook for chat plugin
+        do_action('hamnaghsheh_file_action', $file_id, $project_id, $user_id, 'delete');
 
         $_SESSION['alert'] = ['type' => 'success', 'message' => '✅ فایل با موفقیت حذف شد.'];
         wp_redirect(home_url('/show-project/?id=' . $project_id));
@@ -318,8 +324,49 @@ class Hamnaghsheh_File_Upload
             ['%d', '%d', '%d', '%s']
         );
 
+        // ✅ Fire hook for chat plugin
+        do_action('hamnaghsheh_file_action', $file_id, $project_id, $user_id, 'replace');
+
         $_SESSION['alert'] = ['type' => 'success', 'message' => '✅ فایل با موفقیت جایگزین شد.'];
         wp_redirect(home_url('/show-project/?id=' . $project_id));
         exit;
+    }
+
+    /**
+     * Get file details by ID
+     * Used by chat plugin to display file information
+     * 
+     * @param int $file_id
+     * @return object|null File object or null if not found
+     * @since 1.2.0
+     */
+    public static function get_file_by_id($file_id) {
+        global $wpdb;
+        $table = $wpdb->prefix . 'hamnaghsheh_files';
+        
+        return $wpdb->get_row($wpdb->prepare(
+            "SELECT * FROM {$table} WHERE id = %d",
+            $file_id
+        ));
+    }
+
+    /**
+     * Get all files for a project
+     * Used by chat plugin for file mention autocomplete
+     * 
+     * @param int $project_id
+     * @return array Array of file objects
+     * @since 1.2.0
+     */
+    public static function get_project_files($project_id) {
+        global $wpdb;
+        $table = $wpdb->prefix . 'hamnaghsheh_files';
+        
+        return $wpdb->get_results($wpdb->prepare(
+            "SELECT id, file_name, file_size, file_path FROM {$table} 
+             WHERE project_id = %d 
+             ORDER BY uploaded_at DESC",
+            $project_id
+        ));
     }
 }
