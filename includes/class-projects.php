@@ -310,6 +310,10 @@ class Hamnaghsheh_Projects
   public static function get_user_project_permission($project_id, $user_id = null) {
     if (!$user_id) {
       $user_id = get_current_user_id();
+      // If not authenticated, return false
+      if (!$user_id) {
+        return false;
+      }
     }
     
     global $wpdb;

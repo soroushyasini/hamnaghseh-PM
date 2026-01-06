@@ -199,5 +199,5 @@ if ($permission !== 'owner') {
 ## Support
 
 For issues or questions about integration, please:
-1. Check the [hamnaghsheh-messenger](https://github.com/soroushyasini/hamnaghsheh-messenger) reference implementation
+1. Check the reference implementation in the Hamnaghsheh Messenger plugin
 2. Open an issue in the [Hamnaghsheh PM repository](https://github.com/soroushyasini/hamnaghseh-PM)

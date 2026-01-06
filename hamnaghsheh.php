@@ -12,6 +12,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+// Version constant - keep in sync with plugin header
 define('HAMNAGHSHEH_VERSION', '1.2.0');
 define('HAMNAGHSHEH_DIR', plugin_dir_path(__FILE__));
 define('HAMNAGHSHEH_URL', plugin_dir_url(__FILE__));
