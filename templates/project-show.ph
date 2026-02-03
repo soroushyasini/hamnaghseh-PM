@@ -255,7 +255,7 @@ function jalaliDate($datetime) {
                         </a>
                     <?php endif; ?>
                     
-                    <?php if ($can_upload): ?>
+                    <?php if ($can_manage): ?>
                       <button onclick="openFileLogsModal(<?php echo $f['id']; ?>)"
                         class="bg-[#09375B] hover:bg-[#072c48] text-white px-3 py-1 rounded-lg text-xs font-semibold transition flex items-center justify-center">سوابق</button>
                     <?php endif; ?>

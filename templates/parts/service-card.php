@@ -3,7 +3,7 @@ if (!defined('ABSPATH'))
     exit;
 ?>
 
-<div class="service-card bg-white rounded-lg shadow-md overflow-hidden border border-gray-200 hover:shadow-lg transition-shadow" 
+<div class="service-card bg-white rounded-lg shadow-md overflow-hidden border border-gray-200 hover:shadow-lg transition-shadow mx-auto max-w-sm"
      data-service-key="<?php echo esc_attr($service->service_key); ?>"
      data-service-name="<?php echo esc_attr($service->service_name_fa); ?>"
      data-price="<?php echo esc_attr($service->price_per_session); ?>">

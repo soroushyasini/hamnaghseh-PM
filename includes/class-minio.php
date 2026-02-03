@@ -7,11 +7,17 @@ class Hamnaghsheh_Minio {
 
     private static $instance = null;
 
-    private $endpoint = 's3.greenplus.cloud:9000';
-    private $access   = 'gp-client1';
-    private $secret   = 'NtiW20Mlu37M2A9lZTl65rjCnkIX';
-    private $bucket   = 'gp-client1';
+    private $endpoint = 's3.ir-thr-at1.arvanstorage.ir';
+    private $access   = '579536ef-2b3d-4e32-b4b6-5bd11a411eec';
+    private $secret   = '71303dbbbd6f3f813b006459505ed5236e2f98fe33361ceadc3803a8f4a1e31a';
+    private $bucket   = 'hamaghsheh-storage';
     private $use_ssl  = true;
+
+    // private $endpoint = 's3.greenplus.cloud:9001';
+    // private $access   = 'gp-client1';
+    // private $secret   = 'NtiW20Mlu37M2A9lZTl65rjCnkIX';
+    // private $bucket   = 'gp-client1';
+    // private $use_ssl  = true;
 
     private $client = null;
 

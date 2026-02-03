@@ -56,7 +56,7 @@ if (class_exists('Hamnaghsheh_Users')) {
         class="mb-4 block text-white hover:text-[#FFCF00] text-sm truncate transition-colors outline-none">
         پروژه‌ها
     </a>
-    <a href="<?php echo get_site_url() . '/my-account/profile'; ?>"
+    <a href="<?php echo get_site_url() . '/profile'; ?>"
         class="mb-4 block text-white hover:text-[#FFCF00] text-sm truncate transition-colors outline-none">
         پروفایل
     </a>

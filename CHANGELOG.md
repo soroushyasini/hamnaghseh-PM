@@ -1,23 +1,5 @@
 # Changelog - Order Management System Simplification
 
-## [1.2.0] - 2026-01-06
-
-### Added
-- Integration hooks for Hamnaghsheh Messenger (chat plugin)
-- `hamnaghsheh_file_action` hook fires on upload/replace/delete/download/see
-- `hamnaghsheh_chat_render` hook allows chat UI injection on project pages
-- Helper functions for chat plugin: `get_file_by_id()`, `get_project_files()`, `get_user_project_permission()`
-- Public API methods for external plugin integration
-
-### Changed
-- Improved file operation logging to support real-time notifications
-- Enhanced project permission system for third-party plugin access
-
-### Developer Notes
-- Chat plugin can now listen to file actions and display them in timeline
-- All hooks are backward-compatible and non-breaking
-- If chat plugin is not active, hooks do nothing (no performance impact)
-
 ## [1.3.0] - 2025-12-29
 
 ### Added

@@ -46,9 +46,6 @@ class Hamnaghsheh_Projects
             'created_at'  => current_time('mysql'),
         ]);
     
-        // ✅ Fire hook for chat plugin
-        do_action('hamnaghsheh_file_action', $file_id, $project_id, $user_id, 'download');
-
         wp_send_json_success();
     }
     
@@ -68,9 +65,6 @@ class Hamnaghsheh_Projects
             'created_at'  => current_time('mysql'),
         ]);
     
-        // ✅ Fire hook for chat plugin
-        do_action('hamnaghsheh_file_action', $file_id, $project_id, $user_id, 'see');
-
         wp_send_json_success();
     }
   public function create_project()
@@ -296,65 +290,5 @@ class Hamnaghsheh_Projects
     );
     wp_redirect(home_url('/show-project/?id=' . $project_id));
     exit;
-  }
-
-  /**
-   * Get user's permission level for a project
-   * Used by chat plugin to enforce access control
-   * 
-   * @param int $project_id
-   * @param int|null $user_id User ID (defaults to current user)
-   * @return string|false 'owner', 'upload', 'view', or false if no access
-   * @since 1.2.0
-   */
-  public static function get_user_project_permission($project_id, $user_id = null) {
-    if (!$user_id) {
-      $user_id = get_current_user_id();
-      // If not authenticated, return false
-      if (!$user_id) {
-        return false;
-      }
-    }
-    
-    global $wpdb;
-    $table_projects = $wpdb->prefix . 'hamnaghsheh_projects';
-    $table_assignments = $wpdb->prefix . 'hamnaghsheh_project_assignments';
-    
-    // Check if owner
-    $project = $wpdb->get_row($wpdb->prepare(
-      "SELECT user_id FROM {$table_projects} WHERE id = %d",
-      $project_id
-    ));
-    
-    if ($project && $project->user_id == $user_id) {
-      return 'owner';
-    }
-    
-    // Check assignments table
-    $assignment = $wpdb->get_row($wpdb->prepare(
-      "SELECT permission FROM {$table_assignments} 
-       WHERE project_id = %d AND user_id = %d",
-      $project_id, $user_id
-    ));
-    
-    return $assignment ? $assignment->permission : false;
-  }
-
-  /**
-   * Get project details by ID
-   * Used by chat plugin to display project context
-   * 
-   * @param int $project_id
-   * @return object|null Project object or null if not found
-   * @since 1.2.0
-   */
-  public static function get_project_by_id($project_id) {
-    global $wpdb;
-    $table = $wpdb->prefix . 'hamnaghsheh_projects';
-    
-    return $wpdb->get_row($wpdb->prepare(
-      "SELECT * FROM {$table} WHERE id = %d",
-      $project_id
-    ));
   }
 }
