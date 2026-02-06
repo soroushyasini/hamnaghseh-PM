@@ -333,8 +333,8 @@ function jalaliDate($datetime) {
        * Allows the Hamnaghsheh Messenger plugin (or any other chat plugin)
        * to render chat UI on the project page.
        * 
-       * @param int    $project->id  The current project ID
-       * @param object $project      The full project object
+       * @param int    $project_id  The current project ID
+       * @param object $project     The full project object
        * 
        * @since 1.2.0
        * @hook hamnaghsheh_chat_render
