@@ -34,7 +34,7 @@ if (!defined('ABSPATH'))
                 <p>در حال حاضر خدمتی در دسترس نیست.</p>
             </div>
         <?php else : ?>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 services-grid">
+            <div class="flex flex-wrap justify-center services-grid">
                 <?php foreach ($services as $service) : ?>
                     <?php include HAMNAGHSHEH_DIR . 'templates/parts/service-card.php'; ?>
                 <?php endforeach; ?>
