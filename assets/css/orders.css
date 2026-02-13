@@ -172,7 +172,7 @@
     flex-shrink: 0;
 }
 
-/* Price Info Item */
+/* Price Info Item - RTL: hover moves right (away from edge) */
 .price-info {
     background-color: #ffffff;
     border-radius: 15px;
@@ -276,6 +276,7 @@
     box-shadow: 0 5px 15px rgba(9, 55, 91, 0.3);
 }
 
+/* Arrow icon flipped for RTL - points left in RTL context */
 .order-service-btn svg {
     display: inline-block;
     margin-right: 8px;
