@@ -23,7 +23,7 @@ if (!defined('ABSPATH'))
             
             <!-- Trust Badges -->
             <div class="trust-badges">
-                <span class="trust-badge">۵۰۰+ پروژه موفق</span>
+                <span class="trust-badge">8۰+ پروژه موفق</span>
                 <span class="trust-badge">خدمات حرفه‌ای</span>
                 <span class="trust-badge">پشتیبانی ۲۴ ساعته</span>
             </div>
