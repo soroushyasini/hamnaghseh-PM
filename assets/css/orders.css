@@ -11,9 +11,25 @@
    SERVICES PAGE - HERO HEADER STYLES
    ============================================ */
 
-.services-hero {
-    text-align: center;
-    margin-bottom: 40px;
+/* Hero Icon Wrapper */
+.hero-icon-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.services-hero h1 {
+    color: #09375b;
+    font-size: 32px;
+    font-weight: 900;
+    margin-bottom: 15px;
+}
+
+.services-hero p {
+    color: #09375b;
+    font-size: 18px;
+    font-weight: 500;
+    margin-bottom: 30px;
 }
 
 .service-hero-icon {
@@ -125,6 +141,14 @@
     pointer-events: none;
 }
 
+/* Service Header (icon + title) */
+.service-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
 /* Service Icon Circle */
 .service-icon {
     width: 50px;
@@ -210,6 +234,10 @@
     padding: 15px;
 }
 
+.total-section .total-value {
+    color: #09375b;
+}
+
 /* CTA Button */
 .order-service-btn {
     width: 100%;
@@ -231,6 +259,11 @@
     background-color: #062a45;
     transform: translateY(-2px);
     box-shadow: 0 5px 15px rgba(9, 55, 91, 0.3);
+}
+
+.order-service-btn svg {
+    display: inline-block;
+    margin-right: 8px;
 }
 
 /* ============================================

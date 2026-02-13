@@ -20,7 +20,7 @@ if (!defined('ABSPATH'))
 
     <div class="p-5">
         <!-- Service Icon and Title -->
-        <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+        <div class="service-header">
             <div class="service-icon">
                 <?php if (strpos($service->service_key, 'half') !== false): ?>
                     <!-- Half-day icon (clock/half-circle) -->
@@ -75,7 +75,7 @@ if (!defined('ABSPATH'))
         <!-- Total Section -->
         <div class="total-section mb-4">
             <div class="text-sm text-gray-600 mb-1">مجموع:</div>
-            <div class="text-xl font-bold" style="color: #09375b;">
+            <div class="text-xl font-bold total-value">
                 <span class="total-price"><?php echo number_format($service->price_per_session, 0, '.', ','); ?></span> تومان
             </div>
         </div>
@@ -83,7 +83,7 @@ if (!defined('ABSPATH'))
         <!-- CTA Button -->
         <button type="button" class="order-service-btn">
             <span>ثبت سفارش</span>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: inline-block; margin-right: 8px;" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                 <path d="M9 2L20 12L9 22" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
         </button>
