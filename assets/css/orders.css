@@ -112,13 +112,13 @@
 /* Responsive widths for flexbox layout */
 @media (min-width: 768px) {
     .service-card {
-        width: calc(50% - 15px);
+        width: calc((100% - 30px) / 2);
     }
 }
 
 @media (min-width: 1024px) {
     .service-card {
-        width: calc(33.333% - 20px);
+        width: calc((100% - 60px) / 3);
         max-width: 400px;
     }
 }
