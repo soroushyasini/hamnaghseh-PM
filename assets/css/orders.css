@@ -11,6 +11,11 @@
    SERVICES PAGE - HERO HEADER STYLES
    ============================================ */
 
+.services-hero {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
 /* Hero Icon Wrapper */
 .hero-icon-wrapper {
     display: flex;
@@ -74,6 +79,11 @@
 /* ============================================
    SERVICE CARDS - REDESIGNED
    ============================================ */
+
+/* Grid */
+.services-grid {
+    gap: 30px;
+}
 
 /* Fade-in Animation */
 @keyframes fadeInUp {
@@ -199,6 +209,11 @@
     background-color: #09375b;
     color: white;
     transform: scale(1.05);
+}
+
+.quantity-btn-text {
+    font-size: 20px;
+    font-weight: bold;
 }
 
 .quantity-input {

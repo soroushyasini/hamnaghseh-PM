@@ -63,11 +63,11 @@ if (!defined('ABSPATH'))
             <label class="text-sm font-semibold text-gray-700 mb-2 block">تعداد جلسات:</label>
             <div class="flex items-center justify-center gap-3">
                 <button type="button" class="quantity-minus">
-                    <span style="font-size: 20px; font-weight: bold;">−</span>
+                    <span class="quantity-btn-text">−</span>
                 </button>
                 <input type="number" class="quantity-input" value="1" min="1" readonly>
                 <button type="button" class="quantity-plus">
-                    <span style="font-size: 20px; font-weight: bold;">+</span>
+                    <span class="quantity-btn-text">+</span>
                 </button>
             </div>
         </div>
