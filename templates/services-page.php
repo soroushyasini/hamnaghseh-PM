@@ -5,9 +5,28 @@ if (!defined('ABSPATH'))
 
 <div class="wrap hamnaghsheh-services p-5 lg:p-10" dir="rtl">
     <div class="max-w-6xl mx-auto">
-        <div class="mb-8">
-            <h1 class="font-black text-2xl xl:text-3xl mb-3 text-[#09375B]">خدمات نقشه‌برداری</h1>
-            <p class="text-gray-600">خدمات نقشه‌برداری را انتخاب کرده و سفارش خود را ثبت کنید.</p>
+        <!-- Hero Header Section -->
+        <div class="services-hero">
+            <!-- Decorative Icon -->
+            <div style="display: flex; justify-content: center; margin-bottom: 20px;">
+                <div class="service-hero-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M2 17L12 22L22 17" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M2 12L12 17L22 12" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+            </div>
+            
+            <h1 style="color: #09375b; font-size: 32px; font-weight: 900; margin-bottom: 15px;">خدمات نقشه‌برداری</h1>
+            <p style="color: #09375b; font-size: 18px; font-weight: 500; margin-bottom: 30px;">خدمات نقشه‌برداری را انتخاب کرده و سفارش خود را ثبت کنید</p>
+            
+            <!-- Trust Badges -->
+            <div class="trust-badges">
+                <span class="trust-badge">۵۰۰+ پروژه موفق</span>
+                <span class="trust-badge">خدمات حرفه‌ای</span>
+                <span class="trust-badge">پشتیبانی ۲۴ ساعته</span>
+            </div>
         </div>
 
         <?php if (empty($services)) : ?>
@@ -15,7 +34,7 @@ if (!defined('ABSPATH'))
                 <p>در حال حاضر خدمتی در دسترس نیست.</p>
             </div>
         <?php else : ?>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3" style="gap: 30px;">
                 <?php foreach ($services as $service) : ?>
                     <?php include HAMNAGHSHEH_DIR . 'templates/parts/service-card.php'; ?>
                 <?php endforeach; ?>

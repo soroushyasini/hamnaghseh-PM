@@ -7,24 +7,193 @@
     font-family: 'Vazirmatn', 'Vazir', sans-serif;
 }
 
-/* Service Cards */
-.service-card {
-    transition: all 0.3s ease;
+/* ============================================
+   SERVICES PAGE - HERO HEADER STYLES
+   ============================================ */
+
+.services-hero {
+    text-align: center;
+    margin-bottom: 40px;
 }
+
+.service-hero-icon {
+    width: 60px;
+    height: 60px;
+    background-color: #09375b;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+}
+
+/* Trust Badges */
+.trust-badges {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+    margin-top: 25px;
+}
+
+.trust-badge {
+    background-color: white;
+    color: #09375b;
+    border: 2px solid #09375b;
+    border-radius: 50px;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+.trust-badge:hover {
+    background-color: #09375b;
+    color: white;
+    transform: translateY(-2px);
+}
+
+/* ============================================
+   SERVICE CARDS - REDESIGNED
+   ============================================ */
+
+/* Fade-in Animation */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.service-card {
+    background-color: white;
+    border-radius: 25px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+    border: 1px solid #e5e7eb;
+    transition: all 0.3s ease;
+    animation: fadeInUp 0.6s ease forwards;
+    opacity: 0;
+}
+
+/* Staggered animation delays */
+.service-card:nth-child(1) { animation-delay: 0.1s; }
+.service-card:nth-child(2) { animation-delay: 0.2s; }
+.service-card:nth-child(3) { animation-delay: 0.3s; }
+.service-card:nth-child(4) { animation-delay: 0.4s; }
+.service-card:nth-child(5) { animation-delay: 0.5s; }
+.service-card:nth-child(6) { animation-delay: 0.6s; }
 
 .service-card:hover {
-    transform: translateY(-5px);
+    transform: translateY(-8px);
+    box-shadow: 0 12px 30px rgba(9, 55, 91, 0.15);
 }
 
+/* Accent Bar */
+.service-card-accent {
+    height: 5px;
+    background: linear-gradient(90deg, #FFCF00, #09375b);
+}
+
+/* Service Card Image */
+.service-card-image {
+    position: relative;
+    height: 200px;
+    background-color: #f3f4f6;
+    overflow: hidden;
+}
+
+.service-card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.service-card-image-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(to bottom, rgba(9, 55, 91, 0.1), rgba(9, 55, 91, 0.3));
+    pointer-events: none;
+}
+
+/* Service Icon Circle */
+.service-icon {
+    width: 50px;
+    height: 50px;
+    min-width: 50px;
+    background-color: #09375b;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+/* Price Info Item */
+.price-info {
+    background-color: #ffffff;
+    border-radius: 15px;
+    padding: 15px;
+    border: 1px solid #e5e7eb;
+    transition: transform 0.3s ease;
+}
+
+.price-info:hover {
+    transform: translateX(-5px);
+}
+
+/* Quantity Controls */
 .quantity-minus,
 .quantity-plus {
-    min-width: 40px;
+    width: 45px;
+    height: 45px;
+    min-width: 45px;
+    border-radius: 50%;
+    border: 2px solid #09375b;
+    background: white;
+    color: #09375b;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     cursor: pointer;
     user-select: none;
+    transition: all 0.3s ease;
+    font-weight: bold;
+}
+
+.quantity-minus:hover,
+.quantity-plus:hover {
+    background-color: #09375b;
+    color: white;
+    transform: scale(1.05);
 }
 
 .quantity-input {
+    width: 80px;
+    text-align: center;
+    border: 1px solid #e5e7eb;
+    border-radius: 15px;
+    background-color: #f3f4f6;
+    padding: 10px;
+    font-weight: 600;
+    color: #09375b;
+    transition: all 0.3s ease;
     -moz-appearance: textfield;
+}
+
+.quantity-input:focus {
+    outline: none;
+    border-color: #09375b;
+    background-color: white;
 }
 
 .quantity-input::-webkit-outer-spin-button,
@@ -33,7 +202,87 @@
     margin: 0;
 }
 
-/* Order Cards */
+/* Total Section */
+.total-section {
+    background: rgba(255, 207, 0, 0.1);
+    border-radius: 15px;
+    border: 1px solid rgba(255, 207, 0, 0.3);
+    padding: 15px;
+}
+
+/* CTA Button */
+.order-service-btn {
+    width: 100%;
+    border-radius: 50px;
+    background-color: #09375b;
+    color: white;
+    font-weight: 700;
+    padding: 15px 30px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.order-service-btn:hover {
+    background-color: #062a45;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(9, 55, 91, 0.3);
+}
+
+/* ============================================
+   RESPONSIVE STYLES FOR SERVICES
+   ============================================ */
+
+@media (max-width: 768px) {
+    .services-hero h1 {
+        font-size: 24px !important;
+    }
+    
+    .services-hero p {
+        font-size: 16px !important;
+    }
+    
+    .service-hero-icon {
+        width: 50px;
+        height: 50px;
+    }
+    
+    .trust-badges {
+        gap: 10px;
+    }
+    
+    .trust-badge {
+        font-size: 12px;
+        padding: 8px 16px;
+    }
+    
+    .hamnaghsheh-services {
+        padding: 20px !important;
+    }
+    
+    .service-card {
+        margin-bottom: 20px;
+    }
+    
+    .service-icon {
+        width: 45px;
+        height: 45px;
+        min-width: 45px;
+    }
+    
+    .quantity-input {
+        width: 60px;
+    }
+}
+
+/* ============================================
+   ORDER CARDS (KEEP EXISTING)
+   ============================================ */
+
 .order-card {
     transition: all 0.3s ease;
 }
