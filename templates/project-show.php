@@ -325,7 +325,7 @@ function jalaliDate($datetime) {
         </div>
 
       </div>
-
+      <?php do_action('hamnaghsheh_after_project_content', $project, $files, $members); ?>
     </main>
 
   </div>
