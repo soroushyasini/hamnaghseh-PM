@@ -10,7 +10,7 @@ if (!defined('ABSPATH'))
             <!-- Decorative Icon -->
             <div style="display: flex; justify-content: center; margin-bottom: 20px;">
                 <div class="service-hero-icon">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                         <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                         <path d="M2 17L12 22L22 17" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                         <path d="M2 12L12 17L22 12" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -19,7 +19,7 @@ if (!defined('ABSPATH'))
             </div>
             
             <h1 style="color: #09375b; font-size: 32px; font-weight: 900; margin-bottom: 15px;">خدمات نقشه‌برداری</h1>
-            <p style="color: #09375b; font-size: 18px; font-weight: 500; margin-bottom: 30px;">خدمات نقشه‌برداری را انتخاب کرده و سفارش خود را ثبت کنید</p>
+            <p style="color: #09375b; font-size: 18px; font-weight: 500; margin-bottom: 30px;">خدمات نقشه‌برداری را انتخاب کرده و سفارش خود را ثبت کنید.</p>
             
             <!-- Trust Badges -->
             <div class="trust-badges">

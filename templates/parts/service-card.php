@@ -24,19 +24,19 @@ if (!defined('ABSPATH'))
             <div class="service-icon">
                 <?php if (strpos($service->service_key, 'half') !== false): ?>
                     <!-- Half-day icon (clock/half-circle) -->
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                         <path d="M12 6V12L16 14" stroke="white" stroke-width="2" stroke-linecap="round"/>
                         <circle cx="12" cy="12" r="8" stroke="white" stroke-width="2"/>
                     </svg>
                 <?php elseif (strpos($service->service_key, 'full') !== false): ?>
                     <!-- Full-day icon (sun/full-circle) -->
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                         <circle cx="12" cy="12" r="4" stroke="white" stroke-width="2"/>
                         <path d="M12 2V4M12 20V22M22 12H20M4 12H2M19.07 4.93L17.66 6.34M6.34 17.66L4.93 19.07M19.07 19.07L17.66 17.66M6.34 6.34L4.93 4.93" stroke="white" stroke-width="2" stroke-linecap="round"/>
                     </svg>
                 <?php else: ?>
                     <!-- Generic surveying icon (layers/map) -->
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                         <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                         <path d="M2 17L12 22L22 17" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                         <path d="M2 12L12 17L22 12" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -83,7 +83,7 @@ if (!defined('ABSPATH'))
         <!-- CTA Button -->
         <button type="button" class="order-service-btn">
             <span>ثبت سفارش</span>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: inline-block; margin-right: 8px;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: inline-block; margin-right: 8px;" aria-hidden="true">
                 <path d="M9 2L20 12L9 22" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
         </button>
