@@ -140,6 +140,7 @@ document.querySelectorAll(".replace-btn").forEach((btn) => {
 });
 document.getElementById("closeModalBtn").addEventListener("click", () => {
   document.getElementById("replaceModal").classList.add("hidden");
+  document.getElementById("replaceModal").classList.remove("flex");
 });
 
 /// download
@@ -235,10 +236,14 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
 document.getElementById("open-share-popup").onclick = () => {
-  document.getElementById("share-popup").classList.remove("hidden");
+  const popup = document.getElementById("share-popup");
+  popup.classList.remove("hidden");
+  popup.classList.add("flex");
 };
 document.getElementById("close-share-popup").onclick = () => {
-  document.getElementById("share-popup").classList.add("hidden");
+  const popup = document.getElementById("share-popup");
+  popup.classList.add("hidden");
+  popup.classList.remove("flex");
 };
 
 
