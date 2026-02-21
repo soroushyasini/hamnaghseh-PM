@@ -68,3 +68,93 @@
   max-height: none !important;
   overflow-y: visible !important;
 }
+
+/* ============================================
+   PROJECT VIEW - FILE CARDS (MOBILE)
+   ============================================ */
+
+/* File type badge colors */
+.file-badge-dwg,
+.file-badge-dxf  { background: #09375B; color: #fff; }
+.file-badge-txt  { background: #475569; color: #fff; }
+.file-badge-pdf  { background: #dc2626; color: #fff; }
+.file-badge-kml,
+.file-badge-kmz,
+.file-badge-geojson,
+.file-badge-gpx,
+.file-badge-shp  { background: #16a34a; color: #fff; }
+.file-badge-png,
+.file-badge-jpg,
+.file-badge-jpeg { background: #7c3aed; color: #fff; }
+.file-badge-default { background: #6b7280; color: #fff; }
+
+/* Icon action button */
+.file-action-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    flex-shrink: 0;
+    text-decoration: none;
+}
+
+.file-action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.file-action-btn svg {
+    width: 18px;
+    height: 18px;
+}
+
+/* Bottom Nav Bar */
+.hm-bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background: #09375B;
+    display: flex;
+    align-items: stretch;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.15);
+    padding-bottom: env(safe-area-inset-bottom, 0px); /* iOS safe area */
+}
+
+.hm-bottom-nav a {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 4px;
+    color: rgba(255,255,255,0.65);
+    text-decoration: none;
+    font-size: 10px;
+    gap: 3px;
+    transition: color 0.2s ease;
+    border-top: 2px solid transparent;
+}
+
+.hm-bottom-nav a:hover,
+.hm-bottom-nav a.active {
+    color: #FFCF00;
+    border-top-color: #FFCF00;
+}
+
+.hm-bottom-nav a svg {
+    width: 22px;
+    height: 22px;
+}
+
+@media (min-width: 1024px) {
+    .hm-bottom-nav {
+        display: none;
+    }
+}
