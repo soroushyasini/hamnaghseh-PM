@@ -47,7 +47,7 @@ function jalaliDate($datetime) {
 
 ?>
 
-<div class="wrap hamnaghsheh-dashboard rounded-2xl p-5 lg:p-10">
+<div class="wrap hamnaghsheh-dashboard rounded-2xl p-5 lg:p-10 pb-20 lg:pb-10">
   <div class="flex flex-col lg:flex-row gap-6">
 
     <?php include plugin_dir_path(__FILE__) . 'sidebar-dashboard.php'; ?>
@@ -84,9 +84,10 @@ function jalaliDate($datetime) {
               <input type="hidden" name="project_id" value="<?php echo esc_attr($project->id); ?>">
             
               <label
-                class="border-2 border-dashed border-[#09375B] rounded-2xl bg-[#F8FAFC] p-10 text-center mb-6 hover:bg-[#f2f6fb] transition block cursor-pointer relative overflow-hidden upload-label">
+                class="border-2 border-dashed border-[#09375B] rounded-2xl bg-[#F8FAFC] p-5 lg:p-10 text-center mb-6 hover:bg-[#f2f6fb] transition block cursor-pointer relative overflow-hidden upload-label">
                 <p class="text-[#09375B] font-semibold mb-2">فایل‌های خود را بکشید و در اینجا رها کنید</p>
-                <p class="text-sm text-gray-500">یا برای انتخاب فایل‌ها کلیک کنید</p>
+                <p class="text-sm text-gray-500 mb-3">یا برای انتخاب فایل‌ها کلیک کنید</p>
+                <span class="inline-block bg-[#09375B] text-white text-sm font-semibold px-5 py-2 rounded-full">انتخاب فایل</span>
             
                 <input type="file" name="file" required class="absolute inset-0 opacity-0 cursor-pointer file-input">
               </label>
@@ -104,7 +105,7 @@ function jalaliDate($datetime) {
             </form>
       <?php endif; ?>
 
-      <div class="flex flex-col lg:flex-row justify-between mb-8 space-y-1 lg:space-y-0">
+      <div class="flex flex-col lg:flex-row gap-2 mb-8 lg:items-center">
         
         <!-- added by Soroush - 6 Dec 2025 - Archive Button with Premium Check -->
         <?php if ($can_manage): ?>
@@ -112,12 +113,12 @@ function jalaliDate($datetime) {
             <form action="<?php echo esc_url(admin_url('admin-post.php')); ?>" method="post" onsubmit="return confirmArchive();">
               <input type="hidden" name="action" value="hamnaghsheh_archive_project">
               <input type="hidden" name="project_id" value="<?php echo esc_attr($project->id); ?>">
-              <button type="submit" class="bg-[#09375B] w-100 lg:w-100 text-sm outline-none hover:bg-[#072c48] text-white p-2 rounded transition">
+              <button type="submit" class="w-full lg:w-auto bg-[#09375B] text-sm outline-none hover:bg-[#072c48] text-white px-5 py-2 rounded-full transition hover:-translate-y-0.5">
                 📦 آرشیو پروژه
               </button>
             </form>
           <?php else: ?>
-            <button class="locked-feature bg-gray-300 w-100 lg:w-100 text-sm text-gray-500 p-2 rounded cursor-not-allowed opacity-50"
+            <button class="locked-feature w-full lg:w-auto bg-gray-300 text-sm text-gray-500 px-5 py-2 rounded-full cursor-not-allowed opacity-50"
                     data-current-plan="<?php echo $access_level; ?>"
                     data-feature-name="آرشیو پروژه"
                     title="فقط کاربران اشتراک شخصی و سازمانی">
@@ -126,22 +127,20 @@ function jalaliDate($datetime) {
           <?php endif; ?>
         <?php endif; ?>
 
-        <div class="flex-col flex lg:flex-row space-y-1 gap-0 lg:gap-3 lg:space-y-0">
           <?php if ($can_upload): ?>
-            <button class="bg-[#FFCF00] text-sm outline-none hover:bg-[#e6bd00] text-[#09375B] p-2 rounded transition"
+            <button class="w-full lg:w-auto bg-[#FFCF00] text-sm outline-none hover:bg-[#e6bd00] text-[#09375B] px-5 py-2 rounded-full transition hover:-translate-y-0.5 font-semibold"
               onclick="downloadProjectFiles(<?= $project->id ?>)">⬇️ دانلود همه فایل‌ها</button>
           <?php endif; ?>
           
           <?php if ($can_manage): ?>
             <button id='open-share-popup'
-              class='bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded transition-all duration-200'>
+              class='w-full lg:w-auto bg-blue-600 hover:bg-blue-700 text-white text-sm px-5 py-2 rounded-full transition hover:-translate-y-0.5 font-semibold'>
               🔗 ایجاد لینک اشتراک
             </button>
           <?php endif; ?>
-        </div>
 
         <!-- Share Popup Modal -->
-        <div id="share-popup" style="z-index:1000;" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+        <div id="share-popup" style="z-index:1000;" class="hidden fixed inset-0 bg-black bg-opacity-50 items-center justify-center">
           <div class="bg-white rounded-xl text-sm p-6 w-[600px]">
             <button type="button" id="close-share-popup" class="text-gray-600 text-2xl w-10 h-10"
               style="float: left;">×</button>
@@ -195,135 +194,217 @@ function jalaliDate($datetime) {
 
       </div>
 
-      <div class="overflow-x-auto rounded-2xl border border-gray-200 shadow-sm bg-white">
+      <?php
+      // Precompute viewer URLs for each file (reused in both table and card views)
+      $file_viewer_data = [];
+      if (!empty($files)) {
+        foreach ($files as $f) {
+          $ext = strtolower(pathinfo($f['file_path'], PATHINFO_EXTENSION));
+          $txt_url = add_query_arg('file', $f['file_path'], 'https://hamnaghsheh.ir/txt-viewer/');
+          $cad_url = add_query_arg('file', $f['file_path'], 'https://hamnaghsheh.ir/dwg-viewer/');
+          $gis_url = add_query_arg(array('file' => $f['file_path'], 'type' => $ext), 'https://hamnaghsheh.ir/gis-viewer/');
+          $viewer_url = null;
+          if ($ext === 'txt') {
+            $viewer_url = $txt_url;
+          } elseif ($ext === 'dwg' || $ext === 'dxf') {
+            $viewer_url = $cad_url;
+          } elseif (in_array($ext, ['kml', 'kmz', 'geojson', 'gpx', 'shp'])) {
+            $viewer_url = $gis_url;
+          } elseif (in_array($ext, ['pdf', 'png', 'jpg', 'jpeg'])) {
+            $viewer_url = add_query_arg(array('file' => $f['file_path'], 'type' => $ext), 'https://hamnaghsheh.ir/document-viewer/');
+          }
+          $file_viewer_data[$f['id']] = ['ext' => $ext, 'viewer_url' => $viewer_url];
+        }
+      }
+      ?>
+
+      <!-- ===================== DESKTOP TABLE (≥1024px) ===================== -->
+      <div class="hidden lg:block overflow-x-auto rounded-2xl border border-gray-200 shadow-sm bg-white mb-6">
         <table class="min-w-full text-sm text-gray-700">
           <thead class="bg-[#09375B] text-white text-right">
             <tr>
-              <th class="py-3 px-4 rounded-tr-2xl text-white">ردیف</th>
+              <th class="py-3 px-4 rounded-tr-2xl text-white w-12">ردیف</th>
               <th class="py-3 px-4 text-white">نام فایل</th>
-              <th class="py-3 px-4 rounded-tl-2xl text-center text-white">عملیات</th>
+              <th class="py-3 px-4 rounded-tl-2xl text-center text-white w-64">عملیات</th>
             </tr>
           </thead>
           <tbody>
             <?php if (!empty($files)): ?>
               <?php foreach ($files as $i => $f): ?>
+                <?php $vd = $file_viewer_data[$f['id']]; ?>
                 <tr class="border-b hover:bg-[#f9fafb] transition">
                   <td class="py-3 px-4"><?php echo $i + 1; ?></td>
                   <td class="py-3 px-4 font-medium text-[#09375B]">
                     <?php echo esc_html($f['file_name']); ?>
                     <span class="text-gray-500 text-xs">(<?php echo size_format($f['file_size']); ?>)</span>
                   </td>
-                  <td class="py-3 px-4 flex flex-wrap gap-2 justify-center">
-                    <?php if ($can_upload): ?>
-                      <a href="<?php echo esc_url($f['file_path']); ?>" download onclick="logDownload(<?php echo intval($f['id']); ?>, <?php echo intval($project->id); ?>)"
-                        class="bg-[#FFCF00] hover:bg-[#e6bd00] text-[#09375B] px-3 py-1 rounded-lg text-xs font-semibold transition flex items-center justify-center">دانلود</a>
-                    <?php endif; ?>
-        
-                    <?php 
-                    $ext = strtolower(pathinfo($f['file_path'], PATHINFO_EXTENSION));
-                    $txt_url = add_query_arg('file', $f['file_path'], 'https://hamnaghsheh.ir/txt-viewer/');
-                    $cad_url = add_query_arg('file', $f['file_path'], 'https://hamnaghsheh.ir/dwg-viewer/');
-                    $gis_url = add_query_arg(
-                        array('file' => $f['file_path'], 'type' => $ext),
-                        'https://hamnaghsheh.ir/gis-viewer/'
-                    );
-                    
-                    $viewer_url = null;
-                    $viewer_label = 'مشاهده';
-                    
-                    if ($ext === 'txt') {
-                        $viewer_url = $txt_url;
-                    } elseif ($ext === 'dwg' || $ext === 'dxf') {
-                        $viewer_url = $cad_url;
-                    } elseif (in_array($ext, ['kml', 'kmz', 'geojson', 'gpx'])) {
-                        $viewer_url = $gis_url;
-                    } elseif ($ext === 'shp') {
-                        $viewer_url = $gis_url;
-                    } elseif (in_array($ext, ['pdf', 'png', 'jpg', 'jpeg'])) {
-                        $doc_url = add_query_arg(
-                            array('file' => $f['file_path'], 'type' => $ext),
-                            'https://hamnaghsheh.ir/document-viewer/'
-                        );
-                        $viewer_url = $doc_url;
-                    }
-                    
-                    if ($viewer_url): ?>
-                        <a target="_blank" href="<?php echo esc_url($viewer_url); ?>" 
-                           class="bg-slate-800 hover:bg-slate-900 text-white px-3 py-1 rounded-lg text-xs font-semibold transition flex items-center justify-center"  
-                           onclick="logSee(<?php echo intval($f['id']); ?>, <?php echo intval($project->id); ?>)">
-                            <?php echo esc_html($viewer_label); ?>
-                        </a>
-                    <?php endif; ?>
-                    
-                    <?php if ($can_upload): ?>
-                      <button onclick="openFileLogsModal(<?php echo $f['id']; ?>)"
-                        class="bg-[#09375B] hover:bg-[#072c48] text-white px-3 py-1 rounded-lg text-xs font-semibold transition flex items-center justify-center">سوابق</button>
-                    <?php endif; ?>
-
-                    <?php if ($can_upload): ?>
-                      <button data-file-id="<?php echo esc_attr($f['id']); ?>"
-                        class="replace-btn bg-[#0d4e80] hover:bg-[#09375B] text-white px-3 py-1 rounded-lg text-xs font-semibold transition flex items-center justify-center">
-                        جایگزینی
-                      </button>
-                    <?php endif; ?>
-                    
-                    <?php if ($can_manage): ?>
-                      <a href="<?php echo esc_url(admin_url('admin-post.php?action=hamnaghsheh_delete_file&file_id=' . $f['id'] . '&project_id=' . $project->id)); ?>"
-                        class="flex items-center justify-center bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-lg text-xs font-semibold transition"
-                        onclick="return confirm('آیا از حذف این فایل مطمئن هستید؟');">
-                        حذف
-                      </a>
-                    <?php endif; ?>
+                  <td class="py-3 px-4">
+                    <div class="flex flex-wrap gap-2 justify-center">
+                      <?php if ($can_upload): ?>
+                        <a href="<?php echo esc_url($f['file_path']); ?>" download onclick="logDownload(<?php echo intval($f['id']); ?>, <?php echo intval($project->id); ?>)"
+                          class="bg-[#FFCF00] hover:bg-[#e6bd00] text-[#09375B] px-3 py-1 rounded-lg text-xs font-semibold transition flex items-center justify-center">دانلود</a>
+                      <?php endif; ?>
+                      <?php if ($vd['viewer_url']): ?>
+                        <a target="_blank" href="<?php echo esc_url($vd['viewer_url']); ?>"
+                           class="bg-slate-800 hover:bg-slate-900 text-white px-3 py-1 rounded-lg text-xs font-semibold transition flex items-center justify-center"
+                           onclick="logSee(<?php echo intval($f['id']); ?>, <?php echo intval($project->id); ?>)">مشاهده</a>
+                      <?php endif; ?>
+                      <?php if ($can_upload): ?>
+                        <button onclick="openFileLogsModal(<?php echo $f['id']; ?>)"
+                          class="bg-[#09375B] hover:bg-[#072c48] text-white px-3 py-1 rounded-lg text-xs font-semibold transition flex items-center justify-center">سوابق</button>
+                        <button data-file-id="<?php echo esc_attr($f['id']); ?>"
+                          class="replace-btn bg-[#0d4e80] hover:bg-[#09375B] text-white px-3 py-1 rounded-lg text-xs font-semibold transition flex items-center justify-center">جایگزینی</button>
+                      <?php endif; ?>
+                      <?php if ($can_manage): ?>
+                        <a href="<?php echo esc_url(admin_url('admin-post.php?action=hamnaghsheh_delete_file&file_id=' . $f['id'] . '&project_id=' . $project->id)); ?>"
+                          class="flex items-center justify-center bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-lg text-xs font-semibold transition"
+                          onclick="return confirm('آیا از حذف این فایل مطمئن هستید؟');">حذف</a>
+                      <?php endif; ?>
+                    </div>
                   </td>
                 </tr>
               <?php endforeach; ?>
             <?php else: ?>
               <tr>
-                <td colspan="3" class="text-center py-6 text-gray-500">هیچ فایلی برای این پروژه ثبت نشده است.</td>
+                <td colspan="3" class="text-center py-10">
+                  <div class="flex flex-col items-center gap-2 text-gray-400">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M3 7a2 2 0 012-2h3.586a1 1 0 01.707.293l1.414 1.414A1 1 0 0011.414 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V7z" />
+                    </svg>
+                    <p class="text-sm font-medium">هیچ فایلی بارگذاری نشده است</p>
+                    <p class="text-xs">برای شروع، فایل خود را از بالا آپلود کنید</p>
+                  </div>
+                </td>
               </tr>
             <?php endif; ?>
           </tbody>
         </table>
+      </div>
 
-        <!-- File Logs Modal -->
-        <div id="fileLogsModal"
-          class="fixed inset-0 hidden items-center justify-center z-50 inset-0 bg-black bg-opacity-50">
-          <div class="bg-white rounded-2xl shadow-xl w-11/12 max-w-lg p-6 relative">
-            <button onclick="closeFileLogsModal()"
-              class="absolute top-2 left-3 text-gray-400 hover:text-gray-600 text-xl">×</button>
-            <h2 class="text-lg font-bold mb-4 text-[#09375B]">سوابق فایل</h2>
-            <div id="fileLogsContent" class="space-y-5 text-sm text-gray-700" style="max-height: 300px; overflow-y: scroll;">
-              <p class="text-center text-gray-400">در حال بارگذاری...</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Replace File Modal -->
-        <div id="replaceModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
-          <div class="bg-white rounded-2xl p-6 w-full max-w-md relative shadow-xl">
-            <h2 class="text-lg font-bold mb-4 text-gray-800">جایگزینی فایل</h2>
-
-            <form method="POST" action="<?php echo admin_url('admin-post.php'); ?>" enctype="multipart/form-data">
-              <input type="hidden" name="action" value="hamnaghsheh_replace_file">
-              <input type="hidden" name="file_id" id="replace_file_id">
-              <input type="hidden" name="project_id" value="<?php echo esc_attr($project_id); ?>">
-
-              <label class="block mb-2 text-sm text-gray-700 font-medium">فایل جدید را انتخاب کنید:</label>
-              <input type="file" name="file" class="w-full border border-gray-300 rounded-lg p-2 text-sm mb-4" required>
-
-              <div class="flex justify-end gap-2">
-                <button type="button" id="closeModalBtn"
-                  class="px-3 py-1 text-sm text-gray-600 bg-gray-200 rounded-lg hover:bg-gray-300">
-                  لغو
-                </button>
-                <button type="submit" class="px-3 py-1 text-sm text-white bg-[#0d4e80] rounded-lg hover:bg-[#09375B]">
-                  ثبت جایگزینی
-                </button>
+      <!-- ===================== MOBILE FILE CARDS (<1024px) ===================== -->
+      <div class="lg:hidden space-y-3 mb-6">
+        <?php if (!empty($files)): ?>
+          <?php foreach ($files as $i => $f): ?>
+            <?php
+            $vd = $file_viewer_data[$f['id']];
+            $ext = $vd['ext'];
+            $badge_class = 'file-badge-default';
+            $valid_badges = ['dwg','dxf','txt','pdf','kml','kmz','geojson','gpx','shp','png','jpg','jpeg'];
+            if (in_array($ext, $valid_badges)) {
+              $badge_class = 'file-badge-' . $ext;
+            }
+            ?>
+            <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-4 flex flex-col gap-3">
+              <div class="flex items-center gap-3">
+                <span class="<?php echo esc_attr($badge_class); ?> text-xs font-bold px-2 py-1 rounded-lg shrink-0 uppercase">
+                  .<?php echo esc_html($ext ?: '?'); ?>
+                </span>
+                <div class="min-w-0">
+                  <p class="font-semibold text-[#09375B] text-sm truncate"><?php echo esc_html($f['file_name']); ?></p>
+                  <p class="text-gray-500 text-xs"><?php echo size_format($f['file_size']); ?></p>
+                </div>
               </div>
-            </form>
+              <div class="flex gap-2 flex-wrap">
+                <?php if ($can_upload): ?>
+                  <a href="<?php echo esc_url($f['file_path']); ?>" download
+                     onclick="logDownload(<?php echo intval($f['id']); ?>, <?php echo intval($project->id); ?>)"
+                     class="file-action-btn" style="background:#FFCF00; color:#09375B;"
+                     title="دانلود">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5m0 0l5-5m-5 5V4" />
+                    </svg>
+                  </a>
+                <?php endif; ?>
+                <?php if ($vd['viewer_url']): ?>
+                  <a target="_blank" href="<?php echo esc_url($vd['viewer_url']); ?>"
+                     onclick="logSee(<?php echo intval($f['id']); ?>, <?php echo intval($project->id); ?>)"
+                     class="file-action-btn" style="background:#09375B; color:#fff;"
+                     title="مشاهده">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                  </a>
+                <?php endif; ?>
+                <?php if ($can_upload): ?>
+                  <button onclick="openFileLogsModal(<?php echo $f['id']; ?>)"
+                    class="file-action-btn" style="background:#09375B; color:#fff;"
+                    title="سوابق">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                  </button>
+                  <button data-file-id="<?php echo esc_attr($f['id']); ?>"
+                    class="replace-btn file-action-btn" style="background:#09375B; color:#fff;"
+                    title="جایگزینی">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                  </button>
+                <?php endif; ?>
+                <?php if ($can_manage): ?>
+                  <a href="<?php echo esc_url(admin_url('admin-post.php?action=hamnaghsheh_delete_file&file_id=' . $f['id'] . '&project_id=' . $project->id)); ?>"
+                    class="file-action-btn" style="background:#ef4444; color:#fff;"
+                    onclick="return confirm('آیا از حذف این فایل مطمئن هستید؟');"
+                    title="حذف">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </a>
+                <?php endif; ?>
+              </div>
+            </div>
+          <?php endforeach; ?>
+        <?php else: ?>
+          <div class="bg-white rounded-2xl border border-dashed border-gray-300 p-8 flex flex-col items-center gap-3 text-gray-400">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3 7a2 2 0 012-2h3.586a1 1 0 01.707.293l1.414 1.414A1 1 0 0011.414 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V7z" />
+            </svg>
+            <p class="text-sm font-medium">هیچ فایلی بارگذاری نشده است</p>
+            <p class="text-xs text-center">برای شروع، فایل خود را از بالا آپلود کنید</p>
+          </div>
+        <?php endif; ?>
+      </div>
+
+      <!-- File Logs Modal -->
+      <div id="fileLogsModal"
+        class="fixed inset-0 hidden z-50 bg-black bg-opacity-50"
+        style="align-items:center; justify-content:center;">
+        <div class="bg-white rounded-2xl shadow-xl w-11/12 max-w-lg p-6 relative" style="margin:auto; margin-top:10vh;">
+          <button onclick="closeFileLogsModal()"
+            class="absolute top-2 left-3 text-gray-400 hover:text-gray-600 text-xl">×</button>
+          <h2 class="text-lg font-bold mb-4 text-[#09375B]">سوابق فایل</h2>
+          <div id="fileLogsContent" class="space-y-5 text-sm text-gray-700" style="max-height: 300px; overflow-y: scroll;">
+            <p class="text-center text-gray-400">در حال بارگذاری...</p>
           </div>
         </div>
+      </div>
 
+      <!-- Replace File Modal -->
+      <div id="replaceModal" class="fixed inset-0 hidden z-50 bg-black/50"
+        style="align-items:center; justify-content:center;">
+        <div class="bg-white rounded-2xl p-6 w-full max-w-md relative shadow-xl" style="margin:auto; margin-top:10vh;">
+          <h2 class="text-lg font-bold mb-4 text-gray-800">جایگزینی فایل</h2>
+
+          <form method="POST" action="<?php echo admin_url('admin-post.php'); ?>" enctype="multipart/form-data">
+            <input type="hidden" name="action" value="hamnaghsheh_replace_file">
+            <input type="hidden" name="file_id" id="replace_file_id">
+            <input type="hidden" name="project_id" value="<?php echo esc_attr($project_id); ?>">
+
+            <label class="block mb-2 text-sm text-gray-700 font-medium">فایل جدید را انتخاب کنید:</label>
+            <input type="file" name="file" class="w-full border border-gray-300 rounded-lg p-2 text-sm mb-4" required>
+
+            <div class="flex justify-end gap-2">
+              <button type="button" id="closeModalBtn"
+                class="px-3 py-1 text-sm text-gray-600 bg-gray-200 rounded-lg hover:bg-gray-300">
+                لغو
+              </button>
+              <button type="submit" class="px-3 py-1 text-sm text-white bg-[#0d4e80] rounded-lg hover:bg-[#09375B]">
+                ثبت جایگزینی
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
       <?php do_action('hamnaghsheh_after_project_content', $project, $files, $members); ?>
     </main>
