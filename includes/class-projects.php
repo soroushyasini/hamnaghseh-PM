@@ -90,6 +90,16 @@ class Hamnaghsheh_Projects
       wp_die('نام پروژه الزامی است.');
     }
 
+    // ✅ Block free users from creating projects
+    if (!current_user_can('hamnaghsheh_admin') && !Hamnaghsheh_Users::is_premium_user($user_id)) {
+      if (!class_exists('Hamnaghsheh_Trial_Manager') || !Hamnaghsheh_Trial_Manager::is_trial_active($user_id)) {
+        if (!session_id()) session_start();
+        $_SESSION['alert'] = ['type' => 'error', 'message' => '⚠️ ایجاد پروژه فقط برای کاربران پرمیوم و سازمانی امکانپذیر است. برای ارتقا با مدیر تماس بگیرید.'];
+        wp_redirect(home_url('/dashboard'));
+        exit;
+      }
+    }
+
     global $wpdb;
     $table_name = $wpdb->prefix . 'hamnaghsheh_projects';
     $wpdb->insert($table_name, [

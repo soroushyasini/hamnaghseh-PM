@@ -70,8 +70,8 @@ class Hamnaghsheh_File_Upload
             exit;
         }
 
-        // ✅ NEW: Comprehensive file validation with security checks - added by soroush - 28/12/2025
-        $file_validation = Hamnaghsheh_File_Validator::validate_file_comprehensive($file, $user_id);
+        // ✅ NEW: Project-aware file validation — uses owner's tier for collaborators - updated by soroush
+        $file_validation = Hamnaghsheh_File_Validator::validate_file_for_project($file, $user_id, $project_id, $project->user_id);
         if (!$file_validation['valid']) {
             $_SESSION['alert'] = ['type' => 'error', 'message' => $file_validation['message']];
             wp_redirect(home_url('/show-project/?id=' . $project_id));
@@ -256,8 +256,8 @@ class Hamnaghsheh_File_Upload
             exit;
         }
 
-        // ✅ NEW: Comprehensive file validation - updated by soroush - 28/12/2025
-        $file_validation = Hamnaghsheh_File_Validator::validate_file_comprehensive($file, $user_id);
+        // ✅ NEW: Project-aware file validation — uses owner's tier for collaborators - updated by soroush
+        $file_validation = Hamnaghsheh_File_Validator::validate_file_for_project($file, $user_id, $project_id, $project->user_id);
         if (!$file_validation['valid']) {
             $_SESSION['alert'] = ['type' => 'error', 'message' => $file_validation['message']];
             wp_redirect(home_url('/show-project/?id=' . $project_id));
