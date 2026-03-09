@@ -38,6 +38,15 @@ class Hamnaghsheh_File_Limits
         // Documents
         'pdf' => 52428800,       // 50 MB
         'txt' => 10485760,       // 10 MB
+        
+        // Office formats
+        'xlsx' => 52428800,      // 50 MB
+        'xls'  => 52428800,      // 50 MB
+        'doc'  => 52428800,      // 50 MB
+        'docx' => 52428800,      // 50 MB
+        
+        // Archive formats
+        'rar'  => 524288000,     // 500 MB (same as zip)
     ];
     
     /**
