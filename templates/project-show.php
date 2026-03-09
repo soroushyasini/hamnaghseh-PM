@@ -78,30 +78,18 @@ function jalaliDate($datetime) {
       <?php endif; ?>
 
       <?php if ($can_upload): ?>
-            <form action="<?php echo esc_url(admin_url('admin-post.php')); ?>" method="post" enctype="multipart/form-data"
-                  class="relative upload-form">
-              <input type="hidden" name="action" value="hamnaghsheh_upload_file">
-              <input type="hidden" name="project_id" value="<?php echo esc_attr($project->id); ?>">
-            
-              <label
-                class="border-2 border-dashed border-[#09375B] rounded-2xl bg-[#F8FAFC] p-10 text-center mb-6 hover:bg-[#f2f6fb] transition block cursor-pointer relative overflow-hidden upload-label">
+            <div class="relative upload-zone mb-6">
+              <input type="hidden" id="hamnaghsheh-project-id" value="<?php echo esc_attr($project->id); ?>">
+
+              <label id="hamnaghsheh-upload-label"
+                class="border-2 border-dashed border-[#09375B] rounded-2xl bg-[#F8FAFC] p-10 text-center hover:bg-[#f2f6fb] transition block cursor-pointer relative overflow-hidden upload-label">
                 <p class="text-[#09375B] font-semibold mb-2">فایل‌های خود را بکشید و در اینجا رها کنید</p>
                 <p class="text-sm text-gray-500">یا برای انتخاب فایل‌ها کلیک کنید</p>
-            
-                <input type="file" name="file" required class="absolute inset-0 opacity-0 cursor-pointer file-input">
+                <input type="file" name="file" multiple class="absolute inset-0 opacity-0 cursor-pointer file-input" id="hamnaghsheh-file-input">
               </label>
-            
-              <div class="upload-loading absolute inset-0 flex items-center justify-center bg-white/70 hidden rounded-2xl">
-                <div class="flex flex-col items-center">
-                  <svg class="animate-spin h-6 w-6 text-[#09375B]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor"
-                          d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 00-8 8h4z"></path>
-                  </svg>
-                  <p class="mt-2 text-[#09375B] font-medium text-sm">در حال آپلود...</p>
-                </div>
-              </div>
-            </form>
+
+              <div id="hamnaghsheh-upload-queue" class="mt-4 space-y-3"></div>
+            </div>
       <?php endif; ?>
 
       <div class="flex flex-col lg:flex-row justify-between mb-8 space-y-1 lg:space-y-0">
@@ -233,7 +221,7 @@ function jalaliDate($datetime) {
                     
                     if ($ext === 'txt') {
                         $viewer_url = $txt_url;
-                    } elseif ($ext === 'dwg' || $ext === 'dxf') {
+                    } elseif ($ext === 'dwg') {
                         $viewer_url = $cad_url;
                     } elseif (in_array($ext, ['kml', 'kmz', 'geojson', 'gpx'])) {
                         $viewer_url = $gis_url;

@@ -17,6 +17,9 @@ class Hamnaghsheh_File_Upload
 
         add_action('admin_post_hamnaghsheh_replace_file', [$this, 'replace_file']);
         add_action('admin_post_nopriv_hamnaghsheh_replace_file', [$this, 'replace_file']);
+
+        add_action('wp_ajax_hamnaghsheh_ajax_upload_file', [$this, 'ajax_upload_file']);
+        add_action('wp_ajax_nopriv_hamnaghsheh_ajax_upload_file', [$this, 'ajax_upload_file']);
     }
 
     public function upload_file()
@@ -321,5 +324,113 @@ class Hamnaghsheh_File_Upload
         $_SESSION['alert'] = ['type' => 'success', 'message' => '✅ فایل با موفقیت جایگزین شد.'];
         wp_redirect(home_url('/show-project/?id=' . $project_id));
         exit;
+    }
+
+    /**
+     * AJAX handler for single-file upload with JSON response (used by multi-file JS uploader)
+     */
+    public function ajax_upload_file()
+    {
+        if (!is_user_logged_in()) {
+            wp_send_json_error(['message' => 'برای آپلود فایل باید وارد شوید.']);
+        }
+
+        if (!check_ajax_referer('hamnaghsheh_ajax_nonce', '_ajax_nonce', false)) {
+            wp_send_json_error(['message' => 'خطای امنیتی. لطفاً صفحه را بارگذاری مجدد کنید.']);
+        }
+
+        if (empty($_POST['project_id']) || empty($_FILES['file'])) {
+            wp_send_json_error(['message' => 'درخواست ناقص است.']);
+        }
+
+        global $wpdb;
+        $user_id = get_current_user_id();
+        $project_id = intval($_POST['project_id']);
+        $file = $_FILES['file'];
+
+        $table_projects = $wpdb->prefix . 'hamnaghsheh_projects';
+        $table_files = $wpdb->prefix . 'hamnaghsheh_files';
+        $table_assign = $wpdb->prefix . 'hamnaghsheh_project_assignments';
+        $table_file_logs = $wpdb->prefix . 'hamnaghsheh_file_logs';
+
+        $project = $wpdb->get_row($wpdb->prepare("SELECT * FROM $table_projects WHERE id = %d", $project_id));
+        if (!$project) {
+            wp_send_json_error(['message' => 'پروژه یافت نشد.']);
+        }
+
+        $is_owner = ($project->user_id == $user_id);
+        $has_permission = false;
+
+        if (current_user_can('hamnaghsheh_admin')) {
+            $has_permission = true;
+        } elseif ($is_owner) {
+            $has_permission = true;
+        } else {
+            $assign = $wpdb->get_row($wpdb->prepare("
+                SELECT permission FROM $table_assign
+                WHERE project_id = %d AND user_id = %d
+            ", $project_id, $user_id));
+
+            if ($assign && $assign->permission === 'upload') {
+                $has_permission = true;
+            }
+        }
+
+        if (!$has_permission) {
+            wp_send_json_error(['message' => 'شما مجاز به آپلود در این پروژه نیستید.']);
+        }
+
+        $file_validation = Hamnaghsheh_File_Validator::validate_file_for_project($file, $user_id, $project_id, $project->user_id);
+        if (!$file_validation['valid']) {
+            wp_send_json_error(['message' => $file_validation['message']]);
+        }
+
+        $new_file_size = intval($file['size']);
+        $quota_check = Hamnaghsheh_File_Validator::check_storage_quota($project_id, $new_file_size, $project->user_id);
+        if (!$quota_check['valid']) {
+            wp_send_json_error(['message' => $quota_check['message']]);
+        }
+
+        $minio = Hamnaghsheh_Minio::instance();
+        $response = $minio->upload($file['tmp_name'], $file['name']);
+
+        if (!$response['success']) {
+            wp_send_json_error(['message' => $response['error']]);
+        }
+
+        $relative_path = $response['url'];
+        $key = $response['key'];
+
+        $file_name = Hamnaghsheh_File_Security::sanitize_filename($file['name']);
+        $wpdb->insert($table_files, [
+            'project_id' => $project_id,
+            'user_id'    => $user_id,
+            'file_name'  => $file_name,
+            'key_file'   => $key,
+            'file_path'  => $relative_path,
+            'file_size'  => $new_file_size,
+            'file_type'  => $file['type'],
+            'uploaded_at' => current_time('mysql')
+        ]);
+
+        $file_id = $wpdb->insert_id;
+
+        $wpdb->insert(
+            $table_file_logs,
+            [
+                'file_id'     => $file_id,
+                'project_id'  => $project_id,
+                'user_id'     => $user_id,
+                'action_type' => 'upload',
+            ],
+            ['%d', '%d', '%d', '%s']
+        );
+
+        wp_send_json_success([
+            'message'   => '✅ فایل با موفقیت آپلود شد.',
+            'file_id'   => $file_id,
+            'file_name' => $file_name,
+            'file_size' => $new_file_size,
+        ]);
     }
 }

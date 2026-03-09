@@ -23,7 +23,7 @@ class Hamnaghsheh_File_Validator
         if ($access_level === 'free' && $user_id && class_exists('Hamnaghsheh_Trial_Manager')) {
             if (Hamnaghsheh_Trial_Manager::is_trial_active($user_id)) {
                 // Trial users get same formats as premium
-                return ['dwg', 'dxf', 'txt'];
+                return ['dwg', 'dxf', 'txt', 'xlsx', 'xls', 'doc', 'docx', 'rar'];
             }
         }
         
@@ -33,7 +33,9 @@ class Hamnaghsheh_File_Validator
                 // CAD formats
                 'dwg', 'dxf', 'txt',
                 // GIS formats
-                'kml', 'kmz', 'shp', 'shx', 'dbf', 'prj', 'gpx', 'geojson', 'zip'
+                'kml', 'kmz', 'shp', 'shx', 'dbf', 'prj', 'gpx', 'geojson', 'zip',
+                // Office and archive formats
+                'xlsx', 'xls', 'doc', 'docx', 'rar'
             ],
             'enterprise' => [
                 // CAD formats
@@ -42,7 +44,9 @@ class Hamnaghsheh_File_Validator
                 'kml', 'kmz', 'shp', 'shx', 'dbf', 'prj', 'cpg', 'sbn', 'sbx',
                 'gpx', 'geojson', 'zip',
                 // Document formats
-                'pdf', 'png', 'jpg', 'jpeg'
+                'pdf', 'png', 'jpg', 'jpeg',
+                // Office and archive formats
+                'xlsx', 'xls', 'doc', 'docx', 'rar'
             ]
         ];
 
@@ -425,6 +429,13 @@ class Hamnaghsheh_File_Validator
             }
         }
 
+        if ($file_ext === 'rar') {
+            $rar_check = Hamnaghsheh_File_Security::check_rar_bomb($file['tmp_name']);
+            if (!$rar_check['valid']) {
+                return ['valid' => false, 'message' => $rar_check['message']];
+            }
+        }
+
         return ['valid' => true, 'message' => ''];
     }
 
@@ -498,6 +509,13 @@ class Hamnaghsheh_File_Validator
             $dbf_check = Hamnaghsheh_File_Security::validate_dbf_header($file['tmp_name']);
             if (!$dbf_check['valid']) {
                 return ['valid' => false, 'message' => $dbf_check['message']];
+            }
+        }
+
+        if ($file_ext === 'rar') {
+            $rar_check = Hamnaghsheh_File_Security::check_rar_bomb($file['tmp_name']);
+            if (!$rar_check['valid']) {
+                return ['valid' => false, 'message' => $rar_check['message']];
             }
         }
 
