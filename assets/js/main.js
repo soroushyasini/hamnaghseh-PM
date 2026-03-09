@@ -277,25 +277,27 @@ document.addEventListener("DOMContentLoaded", () => {
             fill.classList.replace("bg-[#FFCF00]", "bg-green-400");
             status.textContent = "✅ آپلود شد";
             status.classList.add("text-green-600");
+            resolve(true);
           } else {
             fill.classList.replace("bg-[#FFCF00]", "bg-red-400");
             status.textContent =
               "❌ خطا: " + (data.data && data.data.message ? data.data.message : "خطای ناشناخته");
             status.classList.add("text-red-600");
+            resolve(false);
           }
         } catch (e) {
           fill.classList.replace("bg-[#FFCF00]", "bg-red-400");
           status.textContent = "❌ خطا در پردازش پاسخ سرور";
           status.classList.add("text-red-600");
+          resolve(false);
         }
-        resolve();
       };
 
       xhr.onerror = () => {
         fill.classList.replace("bg-[#FFCF00]", "bg-red-400");
         status.textContent = "❌ خطا در اتصال به سرور";
         status.classList.add("text-red-600");
-        resolve();
+        resolve(false);
       };
 
       xhr.open("POST", hamnaghsheh_ajax.ajax_url, true);
@@ -309,8 +311,10 @@ document.addEventListener("DOMContentLoaded", () => {
     uploadLabel.style.pointerEvents = "none";
     uploadLabel.classList.add("opacity-50");
 
+    let allSucceeded = true;
     for (const file of files) {
-      await uploadFile(file);
+      const success = await uploadFile(file);
+      if (!success) allSucceeded = false;
     }
 
     isUploading = false;
@@ -318,10 +322,12 @@ document.addEventListener("DOMContentLoaded", () => {
     uploadLabel.classList.remove("opacity-50");
     fileInput.value = "";
 
-    const RELOAD_DELAY_MS = 1500;
-    setTimeout(() => {
-      location.reload();
-    }, RELOAD_DELAY_MS);
+    if (allSucceeded) {
+      const RELOAD_DELAY_MS = 1500;
+      setTimeout(() => {
+        location.reload();
+      }, RELOAD_DELAY_MS);
+    }
   }
 
   fileInput.addEventListener("change", (e) => {
