@@ -38,7 +38,7 @@ class Hamnaghsheh_File_Download
             // انتخاب مقصد درست
             if ($ext === 'txt') {
                 $final_url = $txt_url;
-            } elseif ($ext === 'dwg' || $ext === 'dxf') {
+            } elseif ($ext === 'dwg') {
                 $final_url = $cad_url;
             } else {
                 $final_url = null;

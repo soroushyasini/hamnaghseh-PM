@@ -42,6 +42,15 @@ class Hamnaghsheh_File_Security
         'png' => ['image/png', 'image/x-png', 'image/vnd.mozilla.apng', 'application/octet-stream'],
         'jpg' => ['image/jpeg', 'image/pjpeg', 'image/jpg', 'application/octet-stream'],
         'jpeg' => ['image/jpeg', 'image/pjpeg', 'image/jpg', 'application/octet-stream'],
+        
+        // Office formats
+        'xlsx' => ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/octet-stream'],
+        'xls'  => ['application/vnd.ms-excel', 'application/octet-stream'],
+        'doc'  => ['application/msword', 'application/octet-stream'],
+        'docx' => ['application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/octet-stream'],
+        
+        // Archive formats
+        'rar'  => ['application/vnd.rar', 'application/x-rar-compressed', 'application/x-rar', 'application/octet-stream'],
     ];
     
     /**
@@ -310,6 +319,85 @@ class Hamnaghsheh_File_Security
             ];
         }
         
+        return ['valid' => true, 'message' => ''];
+    }
+
+    /**
+     * Check RAR file for compression bomb and validate magic bytes
+     * 
+     * @param string $file_path Path to RAR file
+     * @return array ['valid' => bool, 'message' => string]
+     */
+    public static function check_rar_bomb($file_path)
+    {
+        // Validate RAR magic bytes: "Rar!\x1a\x07"
+        $handle = fopen($file_path, 'rb');
+        if (!$handle) {
+            return [
+                'valid' => false,
+                'message' => '⚠️ خطا در خواندن فایل RAR.'
+            ];
+        }
+
+        $magic = fread($handle, 7);
+        fclose($handle);
+
+        // RAR4 magic: 52 61 72 21 1A 07 00 (Rar!\x1a\x07\x00)
+        // RAR5 magic: 52 61 72 21 1A 07 01 00 (Rar!\x1a\x07\x01\x00)
+        $rar_signature = "\x52\x61\x72\x21\x1A\x07";
+        if (strlen($magic) < 6 || substr($magic, 0, 6) !== $rar_signature) {
+            return [
+                'valid' => false,
+                'message' => '⚠️ فایل RAR معتبر نیست. هدر فایل اشتباه است.'
+            ];
+        }
+
+        // If RarArchive is available, do a proper compression ratio check
+        if (class_exists('RarArchive')) {
+            $rar = RarArchive::open($file_path);
+            if ($rar === false) {
+                return [
+                    'valid' => false,
+                    'message' => '⚠️ فایل RAR معتبر نیست یا آسیب دیده است.'
+                ];
+            }
+
+            $compressed_size = filesize($file_path);
+            $uncompressed_size = 0;
+            $entries = $rar->getEntries();
+
+            if ($entries !== false) {
+                foreach ($entries as $entry) {
+                    $uncompressed_size += $entry->getUnpackedSize();
+                }
+            }
+
+            $rar->close();
+
+            if ($uncompressed_size > self::MAX_UNCOMPRESSED_SIZE) {
+                return [
+                    'valid' => false,
+                    'message' => sprintf(
+                        '⚠️ فایل RAR بیش از حد بزرگ است. حداکثر اندازه مجاز بعد از استخراج: %s',
+                        size_format(self::MAX_UNCOMPRESSED_SIZE)
+                    )
+                ];
+            }
+
+            if ($compressed_size > 0) {
+                $ratio = $uncompressed_size / $compressed_size;
+                if ($ratio > self::MAX_COMPRESSION_RATIO) {
+                    return [
+                        'valid' => false,
+                        'message' => sprintf(
+                            '⚠️ نسبت فشرده‌سازی فایل RAR مشکوک است (%.1f:1). این ممکن است یک RAR bomb باشد.',
+                            $ratio
+                        )
+                    ];
+                }
+            }
+        }
+
         return ['valid' => true, 'message' => ''];
     }
 }
