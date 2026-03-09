@@ -13,6 +13,17 @@ class Hamnaghsheh_New_Project
 
         $user_id = get_current_user_id();
 
+        // ✅ Block free users from accessing project creation page
+        if (!current_user_can('hamnaghsheh_admin')) {
+            $access_level = Hamnaghsheh_Users::get_user_access_level($user_id);
+            if ($access_level === 'free') {
+                $trial_active = class_exists('Hamnaghsheh_Trial_Manager') && Hamnaghsheh_Trial_Manager::is_trial_active($user_id);
+                if (!$trial_active) {
+                    return '<div class="hamnaghsheh-notice text-yellow-800 bg-yellow-100 w-full p-4 rounded-lg text-md text-center">⚠️ ایجاد پروژه فقط برای کاربران پرمیوم و سازمانی امکانپذیر است. شما میتوانید از طریق لینک اشتراک‌گذاری به پروژه‌های دیگران بپیوندید.</div>';
+                }
+            }
+        }
+
         global $wpdb;
         $current_user_id = Hamnaghsheh_Users::current_id();
 

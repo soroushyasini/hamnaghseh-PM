@@ -281,6 +281,154 @@ class Hamnaghsheh_File_Validator
     }
 
     /**
+     * Check if a user can upload to a specific project.
+     * For assigned users (not owners), use the PROJECT OWNER's tier instead of the uploader's tier.
+     * This allows free users to upload to premium/enterprise projects they've been shared with.
+     *
+     * @param int $user_id The uploading user's ID
+     * @param int $project_id The project ID
+     * @param int $owner_id The project owner's user ID
+     * @return array ['can_upload' => bool, 'message' => string, 'access_level' => string]
+     */
+    public static function can_upload_to_project($user_id, $project_id, $owner_id)
+    {
+        // If the uploader is the project owner, use normal per-user check
+        if ((int) $user_id === (int) $owner_id) {
+            return self::can_user_upload($user_id);
+        }
+
+        // Uploader is an assigned collaborator — check the OWNER's tier
+        $owner_access_level = Hamnaghsheh_Users::get_user_access_level($owner_id);
+
+        if ($owner_access_level === 'free') {
+            // Owner is free themselves — check if they have an active trial
+            if (class_exists('Hamnaghsheh_Trial_Manager') && Hamnaghsheh_Trial_Manager::is_trial_active($owner_id)) {
+                return [
+                    'can_upload' => true,
+                    'message' => '',
+                    'access_level' => 'free_trial'
+                ];
+            }
+            return [
+                'can_upload' => false,
+                'message' => '⚠️ مالک این پروژه دسترسی آپلود ندارد. لطفاً با مالک پروژه تماس بگیرید.',
+                'access_level' => 'free'
+            ];
+        }
+
+        // Owner is premium or enterprise — collaborator can upload under owner's tier
+        return [
+            'can_upload' => true,
+            'message' => '',
+            'access_level' => $owner_access_level
+        ];
+    }
+
+    /**
+     * Project-aware comprehensive file validation.
+     * Uses the project owner's tier for allowed extensions, file size limits, and security checks
+     * when the uploader is an assigned collaborator (not the owner).
+     *
+     * @param array $file $_FILES array element
+     * @param int $user_id Uploading user's ID
+     * @param int $project_id Project ID
+     * @param int $owner_id Project owner's user ID
+     * @return array ['valid' => bool, 'message' => string]
+     */
+    public static function validate_file_for_project($file, $user_id, $project_id, $owner_id)
+    {
+        // 1. Check upload eligibility based on project context
+        $can_upload = self::can_upload_to_project($user_id, $project_id, $owner_id);
+        if (!$can_upload['can_upload']) {
+            return ['valid' => false, 'message' => $can_upload['message']];
+        }
+
+        // Determine effective access level: use owner's tier for collaborators
+        $effective_access_level = ((int) $user_id === (int) $owner_id)
+            ? Hamnaghsheh_Users::get_user_access_level($user_id)
+            : $can_upload['access_level'];
+
+        // For free_trial access level, treat as premium for extension/size purposes
+        $extensions_level = ($effective_access_level === 'free_trial') ? 'premium' : $effective_access_level;
+
+        // 2. Validate file extension against the effective access level
+        $allowed_extensions = self::get_allowed_extensions($extensions_level);
+        $file_ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+
+        if (empty($allowed_extensions)) {
+            return [
+                'valid' => false,
+                'message' => '⚠️ کاربران رایگان امکان آپلود فایل ندارند. برای ارتقا به پلن پرمیوم با مدیر تماس بگیرید.'
+            ];
+        }
+
+        if (!in_array($file_ext, $allowed_extensions)) {
+            $allowed_str = implode(', ', array_map('strtoupper', $allowed_extensions));
+            if ($extensions_level === 'premium') {
+                return [
+                    'valid' => false,
+                    'message' => sprintf(
+                        '⚠️ فرمت فایل %s برای این پروژه مجاز نیست. فرمت‌های مجاز: %s. برای آپلود فایل‌های PDF, PNG, JPG به پلن سازمانی ارتقا دهید.',
+                        strtoupper($file_ext),
+                        $allowed_str
+                    )
+                ];
+            }
+            return [
+                'valid' => false,
+                'message' => sprintf(
+                    '⚠️ فرمت فایل %s مجاز نیست. فرمت‌های مجاز: %s',
+                    strtoupper($file_ext),
+                    $allowed_str
+                )
+            ];
+        }
+
+        // 3. Validate file size against the effective access level
+        $size_check = Hamnaghsheh_File_Security::validate_file_size(
+            $file['size'],
+            $extensions_level,
+            $file_ext
+        );
+        if (!$size_check['valid']) {
+            return ['valid' => false, 'message' => $size_check['message']];
+        }
+
+        // 4. Validate MIME type
+        $mime_check = Hamnaghsheh_File_Security::validate_mime_type(
+            $file['tmp_name'],
+            $file_ext
+        );
+        if (!$mime_check['valid']) {
+            return ['valid' => false, 'message' => $mime_check['message']];
+        }
+
+        // 5. Format-specific security checks
+        if (in_array($file_ext, ['zip', 'kmz'])) {
+            $zip_check = Hamnaghsheh_File_Security::check_zip_bomb($file['tmp_name']);
+            if (!$zip_check['valid']) {
+                return ['valid' => false, 'message' => $zip_check['message']];
+            }
+        }
+
+        if ($file_ext === 'kml') {
+            $kml_check = Hamnaghsheh_File_Security::scan_kml_external_refs($file['tmp_name']);
+            if (!$kml_check['valid']) {
+                return ['valid' => false, 'message' => $kml_check['message']];
+            }
+        }
+
+        if ($file_ext === 'dbf') {
+            $dbf_check = Hamnaghsheh_File_Security::validate_dbf_header($file['tmp_name']);
+            if (!$dbf_check['valid']) {
+                return ['valid' => false, 'message' => $dbf_check['message']];
+            }
+        }
+
+        return ['valid' => true, 'message' => ''];
+    }
+
+    /**
      * Comprehensive file validation with security checks
      * Created by soroush - 28/12/2025
      * 
